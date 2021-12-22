@@ -30,6 +30,7 @@ type FundCreated @entity {
   time: BigInt! # uint256
   managerFeeNumerator: BigInt! # uint256
   managerFeeDenominator: BigInt! # uint256
+  uniqueManager: Manager!
 }
 
 type GovernanceAddressSet @entity {
@@ -104,4 +105,129 @@ type SetPoolStorageVersion @entity {
 type Unpaused @entity {
   id: ID!
   account: Bytes! # address
+}
+
+type Approval @entity {
+  id: ID!
+  owner: Bytes!
+  spender: Bytes!
+  value: BigInt!
+}
+
+type Deposit @entity {
+  id: ID!
+  fundAddress: Bytes!
+  investor: Bytes!
+  assetDeposited: Bytes!
+  valueDeposited: BigInt!
+  fundTokensReceived: BigInt!
+  totalInvestorFundTokens: BigInt!
+  fundValue: BigInt!
+  time: BigInt!
+  block: Int!
+  pool: Pool!
+  totalSupply: BigDecimal!
+  poolName: String!
+  managerName: String!
+  uniqueInvestor: Investor!
+}
+
+type ManagerFeeMinted @entity {
+  id: ID!
+  pool: Bytes!
+  manager: Bytes!
+  available: BigInt!
+  daoFee: BigInt!
+  managerFee: BigInt!
+  tokenPriceAtLastFeeMint: BigInt!
+  block: Int!
+}
+
+type PoolManagerLogicSet @entity {
+  id: ID!
+  poolManagerLogic: Bytes!
+  from: Bytes!
+}
+
+type PoolPrivacyUpdated @entity {
+  id: ID!
+  isPoolPrivate: Boolean!
+}
+
+type TransactionExecuted @entity {
+  id: ID!
+  pool: Bytes!
+  manager: Bytes!
+  transactionType: Int!
+  time: BigInt!
+  poolName: String!
+  managerName: String!
+}
+
+type Transfer @entity {
+  id: ID!
+  from: Bytes!
+  to: Bytes!
+  value: BigInt!
+}
+
+type Withdrawal @entity {
+  id: ID!
+  fundAddress: Bytes!
+  investor: Bytes!
+  valueWithdrawn: BigInt!
+  fundTokensWithdrawn: BigInt!
+  totalInvestorFundTokens: BigInt!
+  fundValue: BigInt!
+  time: BigInt!
+  block: Int!
+  totalSupply: BigDecimal!
+  pool: Pool!
+  poolName: String!
+  uniqueInvestor: Investor!
+  managerName: String!
+}
+
+type Pool @entity {
+  id: ID!
+  fundAddress: Bytes!
+  name: String!
+  manager: Bytes # optional
+  managerName: String!
+  totalSupply: BigDecimal!
+  tokenPrice: BigInt! # uint256
+  decimals: BigInt # optional
+  deposits: [Deposit!]! @derivedFrom(field: "pool")
+  withdrawals: [Withdrawal!]! @derivedFrom(field: "pool")
+}
+
+type Manager @entity {
+  id: ID!
+  managerAddress: Bytes! # address
+  fundCreated: [FundCreated!]! @derivedFrom(field: "uniqueManager")
+}
+
+type Investor @entity {
+  id: ID!
+  investorAddress: Bytes! # address
+  deposits: [Deposit!]! @derivedFrom(field: "uniqueInvestor")
+  withdrawals: [Withdrawal!]! @derivedFrom(field: "uniqueInvestor")
+}
+
+type ExchangeFrom @entity {
+  id: ID!
+  fundAddress: Bytes!
+  sourceAsset: Bytes!
+  sourceAmount: BigInt! # uint256
+  dstAsset: Bytes!
+  time: BigInt!
+}
+
+type ExchangeTo @entity {
+  id: ID!
+  fundAddress: Bytes!
+  sourceAsset: Bytes!
+  dstAsset: Bytes!
+  dstAmount: BigInt! # uint256
+  time: BigInt!
 }
