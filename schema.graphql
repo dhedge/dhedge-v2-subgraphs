@@ -1,0 +1,107 @@
+type DAOAddressSet @entity {
+  id: ID!
+  daoAddress: Bytes! # address
+}
+
+type DaoFeeSet @entity {
+  id: ID!
+  numerator: BigInt! # uint256
+  denominator: BigInt! # uint256
+}
+
+type ExitCooldownSet @entity {
+  id: ID!
+  cooldown: BigInt! # uint256
+}
+
+type ExitFeeSet @entity {
+  id: ID!
+  numerator: BigInt! # uint256
+  denominator: BigInt! # uint256
+}
+
+type FundCreated @entity {
+  id: ID!
+  fundAddress: Bytes! # address
+  isPoolPrivate: Boolean! # bool
+  fundName: String! # string
+  managerName: String! # string
+  manager: Bytes! # address
+  time: BigInt! # uint256
+  managerFeeNumerator: BigInt! # uint256
+  managerFeeDenominator: BigInt! # uint256
+}
+
+type GovernanceAddressSet @entity {
+  id: ID!
+  governanceAddress: Bytes! # address
+}
+
+type LogUpgrade @entity {
+  id: ID!
+  manager: Bytes! # address
+  pool: Bytes! # address
+}
+
+type MaximumSupportedAssetCountSet @entity {
+  id: ID!
+  count: BigInt! # uint256
+}
+
+type OwnershipTransferred @entity {
+  id: ID!
+  previousOwner: Bytes! # address
+  newOwner: Bytes! # address
+}
+
+type Paused @entity {
+  id: ID!
+  account: Bytes! # address
+}
+
+type PoolPerformanceAddressSet @entity {
+  id: ID!
+  poolPerformanceAddress: Bytes! # address
+}
+
+type ProxyCreated @entity {
+  id: ID!
+  proxy: Bytes! # address
+}
+
+type SetAssetHandler @entity {
+  id: ID!
+  assetHandler: Bytes! # address
+}
+
+type SetManagerFeeNumeratorChangeDelay @entity {
+  id: ID!
+  delay: BigInt! # uint256
+}
+
+type SetMaximumManagerFee @entity {
+  id: ID!
+  numerator: BigInt! # uint256
+  denominator: BigInt! # uint256
+}
+
+type SetMaximumManagerFeeNumeratorChange @entity {
+  id: ID!
+  amount: BigInt! # uint256
+}
+
+type SetPoolManagerFee @entity {
+  id: ID!
+  numerator: BigInt! # uint256
+  denominator: BigInt! # uint256
+}
+
+type SetPoolStorageVersion @entity {
+  id: ID!
+  poolStorageVersion: BigInt! # uint256
+}
+
+type Unpaused @entity {
+  id: ID!
+  account: Bytes! # address
+}
