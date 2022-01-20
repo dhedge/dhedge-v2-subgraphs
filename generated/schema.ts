@@ -1201,13 +1201,13 @@ export class Deposit extends Entity {
     this.set("time", Value.fromBigInt(value));
   }
 
-  get block(): i32 {
-    let value = this.get("block");
+  get blockNumber(): i32 {
+    let value = this.get("blockNumber");
     return value!.toI32();
   }
 
-  set block(value: i32) {
-    this.set("block", Value.fromI32(value));
+  set blockNumber(value: i32) {
+    this.set("blockNumber", Value.fromI32(value));
   }
 
   get pool(): string {
@@ -1244,6 +1244,23 @@ export class Deposit extends Entity {
 
   set managerName(value: string) {
     this.set("managerName", Value.fromString(value));
+  }
+
+  get manager(): Bytes | null {
+    let value = this.get("manager");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set manager(value: Bytes | null) {
+    if (!value) {
+      this.unset("manager");
+    } else {
+      this.set("manager", Value.fromBytes(<Bytes>value));
+    }
   }
 
   get uniqueInvestor(): string {
