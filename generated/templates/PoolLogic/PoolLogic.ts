@@ -307,59 +307,53 @@ export class PoolLogic__availableManagerFeeAndTotalFundValueResult {
   }
 }
 
-export class PoolLogic__getFundSummaryResult {
-  value0: string;
-  value1: BigInt;
-  value2: BigInt;
-  value3: Address;
-  value4: string;
-  value5: BigInt;
-  value6: boolean;
-  value7: BigInt;
-  value8: BigInt;
-  value9: BigInt;
-  value10: BigInt;
-
-  constructor(
-    value0: string,
-    value1: BigInt,
-    value2: BigInt,
-    value3: Address,
-    value4: string,
-    value5: BigInt,
-    value6: boolean,
-    value7: BigInt,
-    value8: BigInt,
-    value9: BigInt,
-    value10: BigInt
-  ) {
-    this.value0 = value0;
-    this.value1 = value1;
-    this.value2 = value2;
-    this.value3 = value3;
-    this.value4 = value4;
-    this.value5 = value5;
-    this.value6 = value6;
-    this.value7 = value7;
-    this.value8 = value8;
-    this.value9 = value9;
-    this.value10 = value10;
+export class PoolLogic__getFundSummaryResultValue0Struct extends ethereum.Tuple {
+  get name(): string {
+    return this[0].toString();
   }
 
-  toMap(): TypedMap<string, ethereum.Value> {
-    let map = new TypedMap<string, ethereum.Value>();
-    map.set("value0", ethereum.Value.fromString(this.value0));
-    map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
-    map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
-    map.set("value3", ethereum.Value.fromAddress(this.value3));
-    map.set("value4", ethereum.Value.fromString(this.value4));
-    map.set("value5", ethereum.Value.fromUnsignedBigInt(this.value5));
-    map.set("value6", ethereum.Value.fromBoolean(this.value6));
-    map.set("value7", ethereum.Value.fromUnsignedBigInt(this.value7));
-    map.set("value8", ethereum.Value.fromUnsignedBigInt(this.value8));
-    map.set("value9", ethereum.Value.fromUnsignedBigInt(this.value9));
-    map.set("value10", ethereum.Value.fromUnsignedBigInt(this.value10));
-    return map;
+  get totalSupply(): BigInt {
+    return this[1].toBigInt();
+  }
+
+  get totalFundValue(): BigInt {
+    return this[2].toBigInt();
+  }
+
+  get manager(): Address {
+    return this[3].toAddress();
+  }
+
+  get managerName(): string {
+    return this[4].toString();
+  }
+
+  get creationTime(): BigInt {
+    return this[5].toBigInt();
+  }
+
+  get privatePool(): boolean {
+    return this[6].toBoolean();
+  }
+
+  get performanceFeeNumerator(): BigInt {
+    return this[7].toBigInt();
+  }
+
+  get managerFeeNumerator(): BigInt {
+    return this[8].toBigInt();
+  }
+
+  get managerFeeDenominator(): BigInt {
+    return this[9].toBigInt();
+  }
+
+  get exitFeeNumerator(): BigInt {
+    return this[10].toBigInt();
+  }
+
+  get exitFeeDenominator(): BigInt {
+    return this[11].toBigInt();
   }
 }
 
@@ -720,32 +714,24 @@ export class PoolLogic extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  getFundSummary(): PoolLogic__getFundSummaryResult {
+  getFundSummary(): PoolLogic__getFundSummaryResultValue0Struct {
     let result = super.call(
       "getFundSummary",
-      "getFundSummary():(string,uint256,uint256,address,string,uint256,bool,uint256,uint256,uint256,uint256)",
+      "getFundSummary():((string,uint256,uint256,address,string,uint256,bool,uint256,uint256,uint256,uint256,uint256))",
       []
     );
 
-    return new PoolLogic__getFundSummaryResult(
-      result[0].toString(),
-      result[1].toBigInt(),
-      result[2].toBigInt(),
-      result[3].toAddress(),
-      result[4].toString(),
-      result[5].toBigInt(),
-      result[6].toBoolean(),
-      result[7].toBigInt(),
-      result[8].toBigInt(),
-      result[9].toBigInt(),
-      result[10].toBigInt()
+    return changetype<PoolLogic__getFundSummaryResultValue0Struct>(
+      result[0].toTuple()
     );
   }
 
-  try_getFundSummary(): ethereum.CallResult<PoolLogic__getFundSummaryResult> {
+  try_getFundSummary(): ethereum.CallResult<
+    PoolLogic__getFundSummaryResultValue0Struct
+  > {
     let result = super.tryCall(
       "getFundSummary",
-      "getFundSummary():(string,uint256,uint256,address,string,uint256,bool,uint256,uint256,uint256,uint256)",
+      "getFundSummary():((string,uint256,uint256,address,string,uint256,bool,uint256,uint256,uint256,uint256,uint256))",
       []
     );
     if (result.reverted) {
@@ -753,43 +739,10 @@ export class PoolLogic extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new PoolLogic__getFundSummaryResult(
-        value[0].toString(),
-        value[1].toBigInt(),
-        value[2].toBigInt(),
-        value[3].toAddress(),
-        value[4].toString(),
-        value[5].toBigInt(),
-        value[6].toBoolean(),
-        value[7].toBigInt(),
-        value[8].toBigInt(),
-        value[9].toBigInt(),
-        value[10].toBigInt()
+      changetype<PoolLogic__getFundSummaryResultValue0Struct>(
+        value[0].toTuple()
       )
     );
-  }
-
-  getWithdrawSingleMax(_asset: Address): BigInt {
-    let result = super.call(
-      "getWithdrawSingleMax",
-      "getWithdrawSingleMax(address):(uint256)",
-      [ethereum.Value.fromAddress(_asset)]
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_getWithdrawSingleMax(_asset: Address): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "getWithdrawSingleMax",
-      "getWithdrawSingleMax(address):(uint256)",
-      [ethereum.Value.fromAddress(_asset)]
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   increaseAllowance(spender: Address, addedValue: BigInt): boolean {
@@ -860,6 +813,29 @@ export class PoolLogic extends ethereum.SmartContract {
       "lastDeposit",
       "lastDeposit(address):(uint256)",
       [ethereum.Value.fromAddress(param0)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  lastFeeMintTime(): BigInt {
+    let result = super.call(
+      "lastFeeMintTime",
+      "lastFeeMintTime():(uint256)",
+      []
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_lastFeeMintTime(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "lastFeeMintTime",
+      "lastFeeMintTime():(uint256)",
+      []
     );
     if (result.reverted) {
       return new ethereum.CallResult();
@@ -1613,40 +1589,6 @@ export class WithdrawCall__Outputs {
   _call: WithdrawCall;
 
   constructor(call: WithdrawCall) {
-    this._call = call;
-  }
-}
-
-export class WithdrawSingleCall extends ethereum.Call {
-  get inputs(): WithdrawSingleCall__Inputs {
-    return new WithdrawSingleCall__Inputs(this);
-  }
-
-  get outputs(): WithdrawSingleCall__Outputs {
-    return new WithdrawSingleCall__Outputs(this);
-  }
-}
-
-export class WithdrawSingleCall__Inputs {
-  _call: WithdrawSingleCall;
-
-  constructor(call: WithdrawSingleCall) {
-    this._call = call;
-  }
-
-  get _fundTokenAmount(): BigInt {
-    return this._call.inputValues[0].value.toBigInt();
-  }
-
-  get _asset(): Address {
-    return this._call.inputValues[1].value.toAddress();
-  }
-}
-
-export class WithdrawSingleCall__Outputs {
-  _call: WithdrawSingleCall;
-
-  constructor(call: WithdrawSingleCall) {
     this._call = call;
   }
 }

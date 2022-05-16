@@ -28,6 +28,7 @@ type FundCreated @entity {
   managerName: String! # string
   manager: Bytes! # address
   time: BigInt! # uint256
+  performanceFeeNumerator: BigInt!
   managerFeeNumerator: BigInt! # uint256
   managerFeeDenominator: BigInt! # uint256
   uniqueManager: Manager!
@@ -75,20 +76,21 @@ type SetAssetHandler @entity {
   assetHandler: Bytes! # address
 }
 
-type SetManagerFeeNumeratorChangeDelay @entity {
+type SetMaximumFee @entity {
   id: ID!
-  delay: BigInt! # uint256
-}
-
-type SetMaximumManagerFee @entity {
-  id: ID!
-  numerator: BigInt! # uint256
+  performanceFeeNumerator: BigInt! # uint256
+  managerFeeNumerator: BigInt! # uint256
   denominator: BigInt! # uint256
 }
 
-type SetMaximumManagerFeeNumeratorChange @entity {
+type SetMaximumPerformanceFeeNumeratorChange @entity {
   id: ID!
   amount: BigInt! # uint256
+}
+
+type SetPerformanceFeeNumeratorChangeDelay @entity {
+  id: ID!
+  delay: BigInt! # uint256
 }
 
 type SetPoolManagerFee @entity {
@@ -170,6 +172,8 @@ type Transfer @entity {
   from: Bytes!
   to: Bytes!
   value: BigInt!
+  address: String!
+  block: Int!
 }
 
 type Withdrawal @entity {
