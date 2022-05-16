@@ -127,12 +127,16 @@ export class FundCreated__Params {
     return this._event.parameters[5].value.toBigInt();
   }
 
-  get managerFeeNumerator(): BigInt {
+  get performanceFeeNumerator(): BigInt {
     return this._event.parameters[6].value.toBigInt();
   }
 
-  get managerFeeDenominator(): BigInt {
+  get managerFeeNumerator(): BigInt {
     return this._event.parameters[7].value.toBigInt();
+  }
+
+  get managerFeeDenominator(): BigInt {
+    return this._event.parameters[8].value.toBigInt();
   }
 }
 
@@ -288,60 +292,64 @@ export class SetAssetHandler__Params {
   }
 }
 
-export class SetManagerFeeNumeratorChangeDelay extends ethereum.Event {
-  get params(): SetManagerFeeNumeratorChangeDelay__Params {
-    return new SetManagerFeeNumeratorChangeDelay__Params(this);
+export class SetMaximumFee extends ethereum.Event {
+  get params(): SetMaximumFee__Params {
+    return new SetMaximumFee__Params(this);
   }
 }
 
-export class SetManagerFeeNumeratorChangeDelay__Params {
-  _event: SetManagerFeeNumeratorChangeDelay;
+export class SetMaximumFee__Params {
+  _event: SetMaximumFee;
 
-  constructor(event: SetManagerFeeNumeratorChangeDelay) {
+  constructor(event: SetMaximumFee) {
     this._event = event;
   }
 
-  get delay(): BigInt {
+  get performanceFeeNumerator(): BigInt {
     return this._event.parameters[0].value.toBigInt();
   }
-}
 
-export class SetMaximumManagerFee extends ethereum.Event {
-  get params(): SetMaximumManagerFee__Params {
-    return new SetMaximumManagerFee__Params(this);
-  }
-}
-
-export class SetMaximumManagerFee__Params {
-  _event: SetMaximumManagerFee;
-
-  constructor(event: SetMaximumManagerFee) {
-    this._event = event;
-  }
-
-  get numerator(): BigInt {
-    return this._event.parameters[0].value.toBigInt();
+  get managerFeeNumerator(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
   }
 
   get denominator(): BigInt {
-    return this._event.parameters[1].value.toBigInt();
+    return this._event.parameters[2].value.toBigInt();
   }
 }
 
-export class SetMaximumManagerFeeNumeratorChange extends ethereum.Event {
-  get params(): SetMaximumManagerFeeNumeratorChange__Params {
-    return new SetMaximumManagerFeeNumeratorChange__Params(this);
+export class SetMaximumPerformanceFeeNumeratorChange extends ethereum.Event {
+  get params(): SetMaximumPerformanceFeeNumeratorChange__Params {
+    return new SetMaximumPerformanceFeeNumeratorChange__Params(this);
   }
 }
 
-export class SetMaximumManagerFeeNumeratorChange__Params {
-  _event: SetMaximumManagerFeeNumeratorChange;
+export class SetMaximumPerformanceFeeNumeratorChange__Params {
+  _event: SetMaximumPerformanceFeeNumeratorChange;
 
-  constructor(event: SetMaximumManagerFeeNumeratorChange) {
+  constructor(event: SetMaximumPerformanceFeeNumeratorChange) {
     this._event = event;
   }
 
   get amount(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+}
+
+export class SetPerformanceFeeNumeratorChangeDelay extends ethereum.Event {
+  get params(): SetPerformanceFeeNumeratorChangeDelay__Params {
+    return new SetPerformanceFeeNumeratorChangeDelay__Params(this);
+  }
+}
+
+export class SetPerformanceFeeNumeratorChangeDelay__Params {
+  _event: SetPerformanceFeeNumeratorChangeDelay;
+
+  constructor(event: SetPerformanceFeeNumeratorChangeDelay) {
+    this._event = event;
+  }
+
+  get delay(): BigInt {
     return this._event.parameters[0].value.toBigInt();
   }
 }
@@ -448,19 +456,22 @@ export class PoolFactory__getExitFeeResult {
   }
 }
 
-export class PoolFactory__getMaximumManagerFeeResult {
+export class PoolFactory__getMaximumFeeResult {
   value0: BigInt;
   value1: BigInt;
+  value2: BigInt;
 
-  constructor(value0: BigInt, value1: BigInt) {
+  constructor(value0: BigInt, value1: BigInt, value2: BigInt) {
     this.value0 = value0;
     this.value1 = value1;
+    this.value2 = value2;
   }
 
   toMap(): TypedMap<string, ethereum.Value> {
     let map = new TypedMap<string, ethereum.Value>();
     map.set("value0", ethereum.Value.fromUnsignedBigInt(this.value0));
     map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
+    map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
     return map;
   }
 }
@@ -476,18 +487,20 @@ export class PoolFactory extends ethereum.SmartContract {
     _managerName: string,
     _fundName: string,
     _fundSymbol: string,
+    _performanceFeeNumerator: BigInt,
     _managerFeeNumerator: BigInt,
     _supportedAssets: Array<PoolFactory__createFundInput_supportedAssetsStruct>
   ): Address {
     let result = super.call(
       "createFund",
-      "createFund(bool,address,string,string,string,uint256,(address,bool)[]):(address)",
+      "createFund(bool,address,string,string,string,uint256,uint256,(address,bool)[]):(address)",
       [
         ethereum.Value.fromBoolean(_privatePool),
         ethereum.Value.fromAddress(_manager),
         ethereum.Value.fromString(_managerName),
         ethereum.Value.fromString(_fundName),
         ethereum.Value.fromString(_fundSymbol),
+        ethereum.Value.fromUnsignedBigInt(_performanceFeeNumerator),
         ethereum.Value.fromUnsignedBigInt(_managerFeeNumerator),
         ethereum.Value.fromTupleArray(_supportedAssets)
       ]
@@ -502,18 +515,20 @@ export class PoolFactory extends ethereum.SmartContract {
     _managerName: string,
     _fundName: string,
     _fundSymbol: string,
+    _performanceFeeNumerator: BigInt,
     _managerFeeNumerator: BigInt,
     _supportedAssets: Array<PoolFactory__createFundInput_supportedAssetsStruct>
   ): ethereum.CallResult<Address> {
     let result = super.tryCall(
       "createFund",
-      "createFund(bool,address,string,string,string,uint256,(address,bool)[]):(address)",
+      "createFund(bool,address,string,string,string,uint256,uint256,(address,bool)[]):(address)",
       [
         ethereum.Value.fromBoolean(_privatePool),
         ethereum.Value.fromAddress(_manager),
         ethereum.Value.fromString(_managerName),
         ethereum.Value.fromString(_fundName),
         ethereum.Value.fromString(_fundSymbol),
+        ethereum.Value.fromUnsignedBigInt(_performanceFeeNumerator),
         ethereum.Value.fromUnsignedBigInt(_managerFeeNumerator),
         ethereum.Value.fromTupleArray(_supportedAssets)
       ]
@@ -693,6 +708,29 @@ export class PoolFactory extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toI32());
   }
 
+  getContractGuard(extContract: Address): Address {
+    let result = super.call(
+      "getContractGuard",
+      "getContractGuard(address):(address)",
+      [ethereum.Value.fromAddress(extContract)]
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_getContractGuard(extContract: Address): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "getContractGuard",
+      "getContractGuard(address):(address)",
+      [ethereum.Value.fromAddress(extContract)]
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
   getDaoFee(): PoolFactory__getDaoFeeResult {
     let result = super.call("getDaoFee", "getDaoFee():(uint256,uint256)", []);
 
@@ -790,25 +828,6 @@ export class PoolFactory extends ethereum.SmartContract {
     );
   }
 
-  getGuard(extContract: Address): Address {
-    let result = super.call("getGuard", "getGuard(address):(address)", [
-      ethereum.Value.fromAddress(extContract)
-    ]);
-
-    return result[0].toAddress();
-  }
-
-  try_getGuard(extContract: Address): ethereum.CallResult<Address> {
-    let result = super.tryCall("getGuard", "getGuard(address):(address)", [
-      ethereum.Value.fromAddress(extContract)
-    ]);
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
-  }
-
   getInvestedPools(user: Address): Array<Address> {
     let result = super.call(
       "getInvestedPools",
@@ -874,25 +893,24 @@ export class PoolFactory extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddressArray());
   }
 
-  getMaximumManagerFee(): PoolFactory__getMaximumManagerFeeResult {
+  getMaximumFee(): PoolFactory__getMaximumFeeResult {
     let result = super.call(
-      "getMaximumManagerFee",
-      "getMaximumManagerFee():(uint256,uint256)",
+      "getMaximumFee",
+      "getMaximumFee():(uint256,uint256,uint256)",
       []
     );
 
-    return new PoolFactory__getMaximumManagerFeeResult(
+    return new PoolFactory__getMaximumFeeResult(
       result[0].toBigInt(),
-      result[1].toBigInt()
+      result[1].toBigInt(),
+      result[2].toBigInt()
     );
   }
 
-  try_getMaximumManagerFee(): ethereum.CallResult<
-    PoolFactory__getMaximumManagerFeeResult
-  > {
+  try_getMaximumFee(): ethereum.CallResult<PoolFactory__getMaximumFeeResult> {
     let result = super.tryCall(
-      "getMaximumManagerFee",
-      "getMaximumManagerFee():(uint256,uint256)",
+      "getMaximumFee",
+      "getMaximumFee():(uint256,uint256,uint256)",
       []
     );
     if (result.reverted) {
@@ -900,9 +918,10 @@ export class PoolFactory extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(
-      new PoolFactory__getMaximumManagerFeeResult(
+      new PoolFactory__getMaximumFeeResult(
         value[0].toBigInt(),
-        value[1].toBigInt()
+        value[1].toBigInt(),
+        value[2].toBigInt()
       )
     );
   }
@@ -1006,43 +1025,20 @@ export class PoolFactory extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBoolean());
   }
 
-  managerFeeNumeratorChangeDelay(): BigInt {
+  maximumPerformanceFeeNumeratorChange(): BigInt {
     let result = super.call(
-      "managerFeeNumeratorChangeDelay",
-      "managerFeeNumeratorChangeDelay():(uint256)",
+      "maximumPerformanceFeeNumeratorChange",
+      "maximumPerformanceFeeNumeratorChange():(uint256)",
       []
     );
 
     return result[0].toBigInt();
   }
 
-  try_managerFeeNumeratorChangeDelay(): ethereum.CallResult<BigInt> {
+  try_maximumPerformanceFeeNumeratorChange(): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
-      "managerFeeNumeratorChangeDelay",
-      "managerFeeNumeratorChangeDelay():(uint256)",
-      []
-    );
-    if (result.reverted) {
-      return new ethereum.CallResult();
-    }
-    let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toBigInt());
-  }
-
-  maximumManagerFeeNumeratorChange(): BigInt {
-    let result = super.call(
-      "maximumManagerFeeNumeratorChange",
-      "maximumManagerFeeNumeratorChange():(uint256)",
-      []
-    );
-
-    return result[0].toBigInt();
-  }
-
-  try_maximumManagerFeeNumeratorChange(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall(
-      "maximumManagerFeeNumeratorChange",
-      "maximumManagerFeeNumeratorChange():(uint256)",
+      "maximumPerformanceFeeNumeratorChange",
+      "maximumPerformanceFeeNumeratorChange():(uint256)",
       []
     );
     if (result.reverted) {
@@ -1080,6 +1076,29 @@ export class PoolFactory extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  performanceFeeNumeratorChangeDelay(): BigInt {
+    let result = super.call(
+      "performanceFeeNumeratorChangeDelay",
+      "performanceFeeNumeratorChangeDelay():(uint256)",
+      []
+    );
+
+    return result[0].toBigInt();
+  }
+
+  try_performanceFeeNumeratorChangeDelay(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "performanceFeeNumeratorChangeDelay",
+      "performanceFeeNumeratorChangeDelay():(uint256)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
   poolPerformanceAddress(): Address {
@@ -1240,12 +1259,16 @@ export class CreateFundCall__Inputs {
     return this._call.inputValues[4].value.toString();
   }
 
-  get _managerFeeNumerator(): BigInt {
+  get _performanceFeeNumerator(): BigInt {
     return this._call.inputValues[5].value.toBigInt();
   }
 
+  get _managerFeeNumerator(): BigInt {
+    return this._call.inputValues[6].value.toBigInt();
+  }
+
   get _supportedAssets(): Array<CreateFundCall_supportedAssetsStruct> {
-    return this._call.inputValues[6].value.toTupleArray<
+    return this._call.inputValues[7].value.toTupleArray<
       CreateFundCall_supportedAssetsStruct
     >();
   }
@@ -1687,80 +1710,54 @@ export class SetLogicCall__Outputs {
   }
 }
 
-export class SetManagerFeeNumeratorChangeDelayCall extends ethereum.Call {
-  get inputs(): SetManagerFeeNumeratorChangeDelayCall__Inputs {
-    return new SetManagerFeeNumeratorChangeDelayCall__Inputs(this);
+export class SetMaximumFeeCall extends ethereum.Call {
+  get inputs(): SetMaximumFeeCall__Inputs {
+    return new SetMaximumFeeCall__Inputs(this);
   }
 
-  get outputs(): SetManagerFeeNumeratorChangeDelayCall__Outputs {
-    return new SetManagerFeeNumeratorChangeDelayCall__Outputs(this);
+  get outputs(): SetMaximumFeeCall__Outputs {
+    return new SetMaximumFeeCall__Outputs(this);
   }
 }
 
-export class SetManagerFeeNumeratorChangeDelayCall__Inputs {
-  _call: SetManagerFeeNumeratorChangeDelayCall;
+export class SetMaximumFeeCall__Inputs {
+  _call: SetMaximumFeeCall;
 
-  constructor(call: SetManagerFeeNumeratorChangeDelayCall) {
+  constructor(call: SetMaximumFeeCall) {
     this._call = call;
   }
 
-  get delay(): BigInt {
+  get performanceFeeNumerator(): BigInt {
     return this._call.inputValues[0].value.toBigInt();
   }
+
+  get managerFeeNumerator(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
 }
 
-export class SetManagerFeeNumeratorChangeDelayCall__Outputs {
-  _call: SetManagerFeeNumeratorChangeDelayCall;
+export class SetMaximumFeeCall__Outputs {
+  _call: SetMaximumFeeCall;
 
-  constructor(call: SetManagerFeeNumeratorChangeDelayCall) {
+  constructor(call: SetMaximumFeeCall) {
     this._call = call;
   }
 }
 
-export class SetMaximumManagerFeeCall extends ethereum.Call {
-  get inputs(): SetMaximumManagerFeeCall__Inputs {
-    return new SetMaximumManagerFeeCall__Inputs(this);
+export class SetMaximumPerformanceFeeNumeratorChangeCall extends ethereum.Call {
+  get inputs(): SetMaximumPerformanceFeeNumeratorChangeCall__Inputs {
+    return new SetMaximumPerformanceFeeNumeratorChangeCall__Inputs(this);
   }
 
-  get outputs(): SetMaximumManagerFeeCall__Outputs {
-    return new SetMaximumManagerFeeCall__Outputs(this);
-  }
-}
-
-export class SetMaximumManagerFeeCall__Inputs {
-  _call: SetMaximumManagerFeeCall;
-
-  constructor(call: SetMaximumManagerFeeCall) {
-    this._call = call;
-  }
-
-  get numerator(): BigInt {
-    return this._call.inputValues[0].value.toBigInt();
+  get outputs(): SetMaximumPerformanceFeeNumeratorChangeCall__Outputs {
+    return new SetMaximumPerformanceFeeNumeratorChangeCall__Outputs(this);
   }
 }
 
-export class SetMaximumManagerFeeCall__Outputs {
-  _call: SetMaximumManagerFeeCall;
+export class SetMaximumPerformanceFeeNumeratorChangeCall__Inputs {
+  _call: SetMaximumPerformanceFeeNumeratorChangeCall;
 
-  constructor(call: SetMaximumManagerFeeCall) {
-    this._call = call;
-  }
-}
-
-export class SetMaximumManagerFeeNumeratorChangeCall extends ethereum.Call {
-  get inputs(): SetMaximumManagerFeeNumeratorChangeCall__Inputs {
-    return new SetMaximumManagerFeeNumeratorChangeCall__Inputs(this);
-  }
-
-  get outputs(): SetMaximumManagerFeeNumeratorChangeCall__Outputs {
-    return new SetMaximumManagerFeeNumeratorChangeCall__Outputs(this);
-  }
-}
-
-export class SetMaximumManagerFeeNumeratorChangeCall__Inputs {
-  _call: SetMaximumManagerFeeNumeratorChangeCall;
-
-  constructor(call: SetMaximumManagerFeeNumeratorChangeCall) {
+  constructor(call: SetMaximumPerformanceFeeNumeratorChangeCall) {
     this._call = call;
   }
 
@@ -1769,10 +1766,10 @@ export class SetMaximumManagerFeeNumeratorChangeCall__Inputs {
   }
 }
 
-export class SetMaximumManagerFeeNumeratorChangeCall__Outputs {
-  _call: SetMaximumManagerFeeNumeratorChangeCall;
+export class SetMaximumPerformanceFeeNumeratorChangeCall__Outputs {
+  _call: SetMaximumPerformanceFeeNumeratorChangeCall;
 
-  constructor(call: SetMaximumManagerFeeNumeratorChangeCall) {
+  constructor(call: SetMaximumPerformanceFeeNumeratorChangeCall) {
     this._call = call;
   }
 }
@@ -1803,6 +1800,36 @@ export class SetMaximumSupportedAssetCountCall__Outputs {
   _call: SetMaximumSupportedAssetCountCall;
 
   constructor(call: SetMaximumSupportedAssetCountCall) {
+    this._call = call;
+  }
+}
+
+export class SetPerformanceFeeNumeratorChangeDelayCall extends ethereum.Call {
+  get inputs(): SetPerformanceFeeNumeratorChangeDelayCall__Inputs {
+    return new SetPerformanceFeeNumeratorChangeDelayCall__Inputs(this);
+  }
+
+  get outputs(): SetPerformanceFeeNumeratorChangeDelayCall__Outputs {
+    return new SetPerformanceFeeNumeratorChangeDelayCall__Outputs(this);
+  }
+}
+
+export class SetPerformanceFeeNumeratorChangeDelayCall__Inputs {
+  _call: SetPerformanceFeeNumeratorChangeDelayCall;
+
+  constructor(call: SetPerformanceFeeNumeratorChangeDelayCall) {
+    this._call = call;
+  }
+
+  get delay(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class SetPerformanceFeeNumeratorChangeDelayCall__Outputs {
+  _call: SetPerformanceFeeNumeratorChangeDelayCall;
+
+  constructor(call: SetPerformanceFeeNumeratorChangeDelayCall) {
     this._call = call;
   }
 }

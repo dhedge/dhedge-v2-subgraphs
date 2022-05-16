@@ -12,9 +12,9 @@ import {
   PoolPerformanceAddressSet as PoolPerformanceAddressSetEvent,
   ProxyCreated as ProxyCreatedEvent,
   SetAssetHandler as SetAssetHandlerEvent,
-  SetManagerFeeNumeratorChangeDelay as SetManagerFeeNumeratorChangeDelayEvent,
-  SetMaximumManagerFee as SetMaximumManagerFeeEvent,
-  SetMaximumManagerFeeNumeratorChange as SetMaximumManagerFeeNumeratorChangeEvent,
+  SetMaximumFee as SetMaximumFeeEvent,
+  SetMaximumPerformanceFeeNumeratorChange as SetMaximumPerformanceFeeNumeratorChangeEvent,
+  SetPerformanceFeeNumeratorChangeDelay as SetPerformanceFeeNumeratorChangeDelayEvent,
   SetPoolManagerFee as SetPoolManagerFeeEvent,
   SetPoolStorageVersion as SetPoolStorageVersionEvent,
   Unpaused as UnpausedEvent,
@@ -33,9 +33,9 @@ import {
   PoolPerformanceAddressSet,
   ProxyCreated,
   SetAssetHandler,
-  SetManagerFeeNumeratorChangeDelay,
-  SetMaximumManagerFee,
-  SetMaximumManagerFeeNumeratorChange,
+  SetMaximumFee,
+  SetMaximumPerformanceFeeNumeratorChange,
+  SetPerformanceFeeNumeratorChangeDelay,
   SetPoolManagerFee,
   SetPoolStorageVersion,
   Unpaused,
@@ -96,6 +96,7 @@ export function handleFundCreated(event: FundCreatedEvent): void {
   entity.managerName = event.params.managerName;
   entity.manager = event.params.manager;
   entity.time = event.params.time;
+  entity.performanceFeeNumerator = event.params.performanceFeeNumerator;
   entity.managerFeeNumerator = event.params.managerFeeNumerator;
   entity.managerFeeDenominator = event.params.managerFeeDenominator;
   entity.save();
@@ -177,34 +178,35 @@ export function handleSetAssetHandler(event: SetAssetHandlerEvent): void {
   entity.save();
 }
 
-export function handleSetManagerFeeNumeratorChangeDelay(
-  event: SetManagerFeeNumeratorChangeDelayEvent
+export function handleSetMaximumFee(
+  event: SetMaximumFeeEvent
 ): void {
-  let entity = new SetManagerFeeNumeratorChangeDelay(
-    event.transaction.hash.toHex() + '-' + event.logIndex.toString()
+  let entity = new SetMaximumFee(
+    event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   );
-  entity.delay = event.params.delay;
-  entity.save();
-}
-
-export function handleSetMaximumManagerFee(
-  event: SetMaximumManagerFeeEvent
-): void {
-  let entity = new SetMaximumManagerFee(
-    event.transaction.hash.toHex() + '-' + event.logIndex.toString()
-  );
-  entity.numerator = event.params.numerator;
+  entity.performanceFeeNumerator = event.params.performanceFeeNumerator;
+  entity.managerFeeNumerator = event.params.managerFeeNumerator;
   entity.denominator = event.params.denominator;
   entity.save();
 }
 
-export function handleSetMaximumManagerFeeNumeratorChange(
-  event: SetMaximumManagerFeeNumeratorChangeEvent
+export function handleSetMaximumPerformanceFeeNumeratorChange(
+  event: SetMaximumPerformanceFeeNumeratorChangeEvent
 ): void {
-  let entity = new SetMaximumManagerFeeNumeratorChange(
-    event.transaction.hash.toHex() + '-' + event.logIndex.toString()
+  let entity = new SetMaximumPerformanceFeeNumeratorChange(
+    event.transaction.hash.toHex() + "-" + event.logIndex.toString()
   );
   entity.amount = event.params.amount;
+  entity.save();
+}
+
+export function handleSetPerformanceFeeNumeratorChangeDelay(
+  event: SetPerformanceFeeNumeratorChangeDelayEvent
+): void {
+  let entity = new SetPerformanceFeeNumeratorChangeDelay(
+    event.transaction.hash.toHex() + "-" + event.logIndex.toString()
+  )
+  entity.delay = event.params.delay;
   entity.save();
 }
 
