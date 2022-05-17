@@ -1581,6 +1581,7 @@ export class Transfer extends Entity {
     this.set("from", Value.fromBytes(Bytes.empty()));
     this.set("to", Value.fromBytes(Bytes.empty()));
     this.set("value", Value.fromBigInt(BigInt.zero()));
+    this.set("address", Value.fromString(""));
   }
 
   save(): void {
@@ -1634,6 +1635,24 @@ export class Transfer extends Entity {
 
   set value(value: BigInt) {
     this.set("value", Value.fromBigInt(value));
+  }
+
+  get address(): string {
+    let value = this.get("address");
+    return value!.toString();
+  }
+
+  set address(value: string) {
+    this.set("address", Value.fromString(value));
+  }
+
+  get block(): i32 {
+    let value = this.get("block");
+    return value!.toI32();
+  }
+
+  set block(value: i32) {
+    this.set("block", Value.fromI32(value));
   }
 }
 
