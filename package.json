@@ -4,10 +4,10 @@
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --node https://api.thegraph.com/deploy/ hedgedon/dhedge-optimism",
-    "create-local": "graph create --node http://localhost:8020/ hedgedon/dhedge-optimism",
-    "remove-local": "graph remove --node http://localhost:8020/ hedgedon/dhedge-optimism",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 hedgedon/dhedge-optimism"
+    "deploy": "graph deploy --product hosted-service dhedge/dhedge-v2-optimism",
+    "create-local": "graph create --node http://localhost:8020/ dhedge/dhedge-v2-optimism",
+    "remove-local": "graph remove --node http://localhost:8020/ dhedge/dhedge-v2-optimism",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 dhedge/dhedge-v2-optimism"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "0.29.2",
