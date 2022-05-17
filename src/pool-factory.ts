@@ -1,3 +1,4 @@
+import { BigInt } from '@graphprotocol/graph-ts';
 import {
   DAOAddressSet as DAOAddressSetEvent,
   DaoFeeSet as DaoFeeSetEvent,
@@ -19,6 +20,9 @@ import {
   SetPoolStorageVersion as SetPoolStorageVersionEvent,
   Unpaused as UnpausedEvent,
 } from '../generated/PoolFactory/PoolFactory';
+import {
+  FundCreated as FundCreatedMoonlightEvent,
+} from "../generated/PoolFactoryMoonlight/PoolFactoryMoonlight"
 import {
   DAOAddressSet,
   DaoFeeSet,
@@ -96,7 +100,36 @@ export function handleFundCreated(event: FundCreatedEvent): void {
   entity.managerName = event.params.managerName;
   entity.manager = event.params.manager;
   entity.time = event.params.time;
+  entity.performanceFeeNumerator = BigInt.fromI32(0);
   entity.managerFeeNumerator = event.params.managerFeeNumerator;
+  entity.managerFeeDenominator = event.params.managerFeeDenominator;
+  entity.save();
+
+  PoolLogicTemplate.create(event.params.fundAddress);
+}
+
+export function handleFundCreatedMoonlight(event: FundCreatedMoonlightEvent): void {
+  let entity = new FundCreated(
+    event.transaction.hash.toHex() + "-" + event.logIndex.toString()
+  )
+
+  let managerAddress = event.params.manager.toHexString()
+  let manager = Manager.load(managerAddress)
+  if (!manager) {
+    manager = new Manager(managerAddress)
+    manager.managerAddress = event.params.manager;
+  }
+  manager.save();
+
+  entity.uniqueManager = manager.id;
+  entity.fundAddress = event.params.fundAddress;
+  entity.isPoolPrivate = event.params.isPoolPrivate;
+  entity.fundName = event.params.fundName;
+  entity.managerName = event.params.managerName;
+  entity.manager = event.params.manager;
+  entity.time = event.params.time;
+  entity.performanceFeeNumerator = event.params.performanceFeeNumerator;
+  entity.managerFeeNumerator = event.params.managerFeeDenominator;
   entity.managerFeeDenominator = event.params.managerFeeDenominator;
   entity.save();
 

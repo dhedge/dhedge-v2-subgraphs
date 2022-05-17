@@ -278,6 +278,15 @@ export class FundCreated extends Entity {
     this.set("time", Value.fromBigInt(value));
   }
 
+  get performanceFeeNumerator(): BigInt {
+    let value = this.get("performanceFeeNumerator");
+    return value!.toBigInt();
+  }
+
+  set performanceFeeNumerator(value: BigInt) {
+    this.set("performanceFeeNumerator", Value.fromBigInt(value));
+  }
+
   get managerFeeNumerator(): BigInt {
     let value = this.get("managerFeeNumerator");
     return value!.toBigInt();
