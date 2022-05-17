@@ -6,7 +6,7 @@ dataSources:
     name: PoolFactory
     network: optimism
     source:
-      address: "0x5e61a079A178f0E5784107a4963baAe0c5a680c6"
+      address: '0x5e61a079A178f0E5784107a4963baAe0c5a680c6'
       abi: PoolFactory
       startBlock: 642351
     mapping:
@@ -27,9 +27,9 @@ dataSources:
         - PoolPerformanceAddressSet
         - ProxyCreated
         - SetAssetHandler
-        - SetMaximumFee
-        - SetMaximumPerformanceFeeNumeratorChange
-        - SetPerformanceFeeNumeratorChangeDelay
+        - SetManagerFeeNumeratorChangeDelay
+        - SetMaximumManagerFee
+        - SetMaximumManagerFeeNumeratorChange
         - SetPoolManagerFee
         - SetPoolStorageVersion
         - Unpaused
@@ -45,7 +45,7 @@ dataSources:
           handler: handleExitCooldownSet
         - event: ExitFeeSet(uint256,uint256)
           handler: handleExitFeeSet
-        - event: FundCreated(address,bool,string,string,address,uint256,uint256,uint256,uint256)
+        - event: FundCreated(address,bool,string,string,address,uint256,uint256,uint256)
           handler: handleFundCreated
         - event: GovernanceAddressSet(address)
           handler: handleGovernanceAddressSet
@@ -63,12 +63,12 @@ dataSources:
           handler: handleProxyCreated
         - event: SetAssetHandler(address)
           handler: handleSetAssetHandler
-        - event: SetMaximumFee(uint256,uint256,uint256)
-          handler: handleSetMaximumFee
-        - event: SetMaximumPerformanceFeeNumeratorChange(uint256)
-          handler: handleSetMaximumPerformanceFeeNumeratorChange
-        - event: SetPerformanceFeeNumeratorChangeDelay(uint256)
-          handler: handleSetPerformanceFeeNumeratorChangeDelay
+        - event: SetManagerFeeNumeratorChangeDelay(uint256)
+          handler: handleSetManagerFeeNumeratorChangeDelay
+        - event: SetMaximumManagerFee(uint256,uint256)
+          handler: handleSetMaximumManagerFee
+        - event: SetMaximumManagerFeeNumeratorChange(uint256)
+          handler: handleSetMaximumManagerFeeNumeratorChange
         - event: SetPoolManagerFee(uint256,uint256)
           handler: handleSetPoolManagerFee
         - event: SetPoolStorageVersion(uint256)
@@ -80,7 +80,7 @@ dataSources:
     name: SynthetixGuard
     network: optimism
     source:
-      address: "0xEFEFCa1f7C5ac491d6fE720E6D6725255290D621"
+      address: '0xEFEFCa1f7C5ac491d6fE720E6D6725255290D621'
       abi: SynthetixGuard
       startBlock: 596441
     mapping:

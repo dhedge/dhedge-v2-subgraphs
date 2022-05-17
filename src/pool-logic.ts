@@ -127,8 +127,6 @@ export function handleTransfer(event: TransferEvent): void {
   entity.from = event.params.from;
   entity.to = event.params.to;
   entity.value = event.params.value;
-  entity.address = event.address.toHexString();
-  entity.block = event.block.number.toI32();
   entity.save();
 }
 
