@@ -28,6 +28,7 @@ type FundCreated @entity {
   managerName: String! # string
   manager: Bytes! # address
   time: BigInt! # uint256
+  performanceFeeNumerator: BigInt!
   managerFeeNumerator: BigInt! # uint256
   managerFeeDenominator: BigInt! # uint256
   uniqueManager: Manager!
@@ -170,6 +171,8 @@ type Transfer @entity {
   from: Bytes!
   to: Bytes!
   value: BigInt!
+  address: String!
+  block: Int!
 }
 
 type Withdrawal @entity {
