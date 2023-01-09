@@ -20,3 +20,4 @@
 5. After making necessary code changes, run `yarn codegen`
 6. Run `yarn build` to check there are no compilation errors
 7. Finally, run `yarn deploy` to start deploying latest changes
+8. If #7 throws error `auth failure::Invalid account name or access token`, try passing deploy token explicitly `yarn graph deploy --product hosted-service --deploy-key <your_access_token> dhedge/dhedge-v2-optimism`
