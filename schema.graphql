@@ -162,6 +162,7 @@ type TransactionExecuted @entity {
   manager: Bytes!
   transactionType: Int!
   time: BigInt!
+  blockNumber: Int!
   poolName: String!
   managerName: String!
 }

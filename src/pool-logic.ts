@@ -117,6 +117,7 @@ export function handleTransactionExecuted(
   entity.manager = event.params.manager;
   entity.transactionType = event.params.transactionType;
   entity.time = event.params.time;
+  entity.blockNumber = event.block.number.toI32();
   entity.save();
 }
 
