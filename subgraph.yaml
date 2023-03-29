@@ -1,4 +1,4 @@
-specVersion: 0.0.2
+specVersion: 0.0.4
 schema:
   file: ./schema.graphql
 dataSources:
@@ -96,30 +96,6 @@ dataSources:
         - event: FundCreated(address,bool,string,string,address,uint256,uint256,uint256,uint256)
           handler: handleFundCreatedMoonlight
       file: ./src/pool-factory.ts
-  - kind: ethereum/contract
-    name: SynthetixGuard
-    network: optimism
-    source:
-      address: "0xEFEFCa1f7C5ac491d6fE720E6D6725255290D621"
-      abi: SynthetixGuard
-      startBlock: 596441
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.6
-      language: wasm/assemblyscript
-      entities:
-        - Pool
-        - ExchangeFrom
-        - ExchangeTo
-      abis:
-        - name: SynthetixGuard
-          file: ./abis/SynthetixGuard.json
-      eventHandlers:
-        - event: ExchangeFrom(address,address,uint256,address,uint256)
-          handler: handleExchangeFrom
-        - event: ExchangeTo(address,address,address,uint256,uint256)
-          handler: handleExchangeTo
-      file: ./src/synthetix-guard.ts
 
 templates:
   - kind: ethereum/contract
