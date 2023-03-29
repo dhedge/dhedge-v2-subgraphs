@@ -437,6 +437,14 @@ export class PoolFactoryMoonlight__getDaoFeeResult {
     map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
     return map;
   }
+
+  getValue0(): BigInt {
+    return this.value0;
+  }
+
+  getValue1(): BigInt {
+    return this.value1;
+  }
 }
 
 export class PoolFactoryMoonlight__getExitFeeResult {
@@ -453,6 +461,14 @@ export class PoolFactoryMoonlight__getExitFeeResult {
     map.set("value0", ethereum.Value.fromUnsignedBigInt(this.value0));
     map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
     return map;
+  }
+
+  getValue0(): BigInt {
+    return this.value0;
+  }
+
+  getValue1(): BigInt {
+    return this.value1;
   }
 }
 
@@ -473,6 +489,18 @@ export class PoolFactoryMoonlight__getMaximumFeeResult {
     map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
     map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
     return map;
+  }
+
+  getValue0(): BigInt {
+    return this.value0;
+  }
+
+  getValue1(): BigInt {
+    return this.value1;
+  }
+
+  getValue2(): BigInt {
+    return this.value2;
   }
 }
 

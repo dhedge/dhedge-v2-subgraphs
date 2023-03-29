@@ -429,6 +429,14 @@ export class PoolFactory__getDaoFeeResult {
     map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
     return map;
   }
+
+  getValue0(): BigInt {
+    return this.value0;
+  }
+
+  getValue1(): BigInt {
+    return this.value1;
+  }
 }
 
 export class PoolFactory__getExitFeeResult {
@@ -446,6 +454,14 @@ export class PoolFactory__getExitFeeResult {
     map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
     return map;
   }
+
+  getValue0(): BigInt {
+    return this.value0;
+  }
+
+  getValue1(): BigInt {
+    return this.value1;
+  }
 }
 
 export class PoolFactory__getMaximumManagerFeeResult {
@@ -462,6 +478,14 @@ export class PoolFactory__getMaximumManagerFeeResult {
     map.set("value0", ethereum.Value.fromUnsignedBigInt(this.value0));
     map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
     return map;
+  }
+
+  getValue0(): BigInt {
+    return this.value0;
+  }
+
+  getValue1(): BigInt {
+    return this.value1;
   }
 }
 

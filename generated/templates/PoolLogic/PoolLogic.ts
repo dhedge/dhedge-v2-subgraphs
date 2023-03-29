@@ -305,6 +305,14 @@ export class PoolLogic__availableManagerFeeAndTotalFundValueResult {
     map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
     return map;
   }
+
+  getFee(): BigInt {
+    return this.value0;
+  }
+
+  getFundValue(): BigInt {
+    return this.value1;
+  }
 }
 
 export class PoolLogic__getFundSummaryResultValue0Struct extends ethereum.Tuple {

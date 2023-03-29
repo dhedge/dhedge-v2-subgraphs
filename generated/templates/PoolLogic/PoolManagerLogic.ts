@@ -202,6 +202,18 @@ export class PoolManagerLogic__getFeeResult {
     map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
     return map;
   }
+
+  getValue0(): BigInt {
+    return this.value0;
+  }
+
+  getValue1(): BigInt {
+    return this.value1;
+  }
+
+  getValue2(): BigInt {
+    return this.value2;
+  }
 }
 
 export class PoolManagerLogic__getFeeIncreaseInfoResult {
@@ -221,6 +233,18 @@ export class PoolManagerLogic__getFeeIncreaseInfoResult {
     map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
     map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
     return map;
+  }
+
+  getValue0(): BigInt {
+    return this.value0;
+  }
+
+  getValue1(): BigInt {
+    return this.value1;
+  }
+
+  getValue2(): BigInt {
+    return this.value2;
   }
 }
 
@@ -256,6 +280,18 @@ export class PoolManagerLogic__getFundCompositionResult {
     map.set("value2", ethereum.Value.fromUnsignedBigIntArray(this.value2));
     return map;
   }
+
+  getAssets(): Array<PoolManagerLogic__getFundCompositionResultAssetsStruct> {
+    return this.value0;
+  }
+
+  getBalances(): Array<BigInt> {
+    return this.value1;
+  }
+
+  getRates(): Array<BigInt> {
+    return this.value2;
+  }
 }
 
 export class PoolManagerLogic__getMaximumFeeResult {
@@ -275,6 +311,18 @@ export class PoolManagerLogic__getMaximumFeeResult {
     map.set("value1", ethereum.Value.fromUnsignedBigInt(this.value1));
     map.set("value2", ethereum.Value.fromUnsignedBigInt(this.value2));
     return map;
+  }
+
+  getValue0(): BigInt {
+    return this.value0;
+  }
+
+  getValue1(): BigInt {
+    return this.value1;
+  }
+
+  getValue2(): BigInt {
+    return this.value2;
   }
 }
 
@@ -302,6 +350,14 @@ export class PoolManagerLogic__supportedAssetsResult {
     map.set("value0", ethereum.Value.fromAddress(this.value0));
     map.set("value1", ethereum.Value.fromBoolean(this.value1));
     return map;
+  }
+
+  getAsset(): Address {
+    return this.value0;
+  }
+
+  getIsDeposit(): boolean {
+    return this.value1;
   }
 }
 

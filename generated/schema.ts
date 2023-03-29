@@ -1822,17 +1822,9 @@ export class Pool extends Entity {
     return value!.toStringArray();
   }
 
-  set deposits(value: Array<string>) {
-    this.set("deposits", Value.fromStringArray(value));
-  }
-
   get withdrawals(): Array<string> {
     let value = this.get("withdrawals");
     return value!.toStringArray();
-  }
-
-  set withdrawals(value: Array<string>) {
-    this.set("withdrawals", Value.fromStringArray(value));
   }
 }
 
@@ -1879,10 +1871,6 @@ export class Manager extends Entity {
   get fundCreated(): Array<string> {
     let value = this.get("fundCreated");
     return value!.toStringArray();
-  }
-
-  set fundCreated(value: Array<string>) {
-    this.set("fundCreated", Value.fromStringArray(value));
   }
 }
 
@@ -1931,17 +1919,9 @@ export class Investor extends Entity {
     return value!.toStringArray();
   }
 
-  set deposits(value: Array<string>) {
-    this.set("deposits", Value.fromStringArray(value));
-  }
-
   get withdrawals(): Array<string> {
     let value = this.get("withdrawals");
     return value!.toStringArray();
-  }
-
-  set withdrawals(value: Array<string>) {
-    this.set("withdrawals", Value.fromStringArray(value));
   }
 }
 
