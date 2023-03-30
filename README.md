@@ -1,4 +1,4 @@
-# dHEDGE V2 Optimism
+# dHEDGE V2 Subgraphs
 
 ## Prerequisites
 
@@ -11,13 +11,15 @@
 
 `yarn`
 
+### Development
+
+`cp .env.example .env`
+
+`yarn prepare:<network>` to check no errors present after making code changes
+
 ## Deployment
 
 1. Sign in to https://thegraph.com/hosted-service with your GitHub account
-2. Go to My Dashboard, select DHEDGE V2 OPTIMISM subgraph
-3. In the top right corner, copy your `ACCESS TOKEN`
-4. Run `yarn graph auth --product hosted-service https://api.thegraph.com/deploy/ <your_access_token>`
-5. After making necessary code changes, run `yarn codegen`
-6. Run `yarn build` to check there are no compilation errors
-7. Finally, run `yarn deploy` to start deploying latest changes
-8. If #7 throws error `auth failure::Invalid account name or access token`, try passing deploy token explicitly `yarn graph deploy --product hosted-service --deploy-key <your_access_token> dhedge/dhedge-v2-optimism`
+2. Go to My Dashboard, select `dHEDGE DAO` account
+3. Copy your `ACCESS TOKEN` and paste it into `.env`
+4. `yarn deploy:<network>` to deploy updated subgraph
