@@ -6,9 +6,13 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "prepare:subgraph": "rm -f subgraph.yaml && cp ./manifests/$NETWORK.subgraph.yaml subgraph.yaml && rm -rf generated && yarn codegen && rm -rf build && yarn build",
+    "prepare:polygon:dev": "NETWORK=polygon-dev env-cmd yarn prepare:subgraph",
+    "prepare:polygon": "NETWORK=polygon env-cmd yarn prepare:subgraph",
     "prepare:optimism": "NETWORK=optimism env-cmd yarn prepare:subgraph",
     "prepare:arbitrum": "NETWORK=arbitrum env-cmd yarn prepare:subgraph",
     "deploy:hosted": "graph deploy --product hosted-service $SLUG --deploy-key $ACCESS_TOKEN",
+    "deploy:polygon:dev": "yarn prepare:polygon:dev && SLUG=dhedge/dhedge-v2-polygon-dev env-cmd yarn deploy:hosted",
+    "deploy:polygon": "yarn prepare:polygon && SLUG=dhedge/dhedge/dhedge-v2-polygon env-cmd yarn deploy:hosted",
     "deploy:optimism": "yarn prepare:optimism && SLUG=dhedge/dhedge-v2-optimism env-cmd yarn deploy:hosted",
     "deploy:arbitrum": "yarn prepare:arbitrum && SLUG=dhedge/dhedge-v2-arbitrum env-cmd yarn deploy:hosted"
   },
