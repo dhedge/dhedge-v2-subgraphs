@@ -1,36 +1,20 @@
 import { dataSource } from '@graphprotocol/graph-ts';
 import {
-  Approval as ApprovalEvent,
   Deposit as DepositEvent,
   ManagerFeeMinted as ManagerFeeMintedEvent,
-  PoolManagerLogicSet as PoolManagerLogicSetEvent,
-  PoolPrivacyUpdated as PoolPrivacyUpdatedEvent,
   TransactionExecuted as TransactionExecutedEvent,
   Transfer as TransferEvent,
   Withdrawal as WithdrawalEvent,
 } from '../generated/templates/PoolLogic/PoolLogic';
 import { instantiatePool } from './helpers';
 import {
-  Approval,
   Deposit,
   ManagerFeeMinted,
-  PoolManagerLogicSet,
-  PoolPrivacyUpdated,
   TransactionExecuted,
   Transfer,
   Withdrawal,
   Investor,
 } from '../generated/schema';
-
-export function handleApproval(event: ApprovalEvent): void {
-  let entity = new Approval(
-    event.transaction.hash.toHex() + '-' + event.logIndex.toString()
-  );
-  entity.owner = event.params.owner;
-  entity.spender = event.params.spender;
-  entity.value = event.params.value;
-  entity.save();
-}
 
 export function handleDeposit(event: DepositEvent): void {
   let entity = new Deposit(
@@ -78,26 +62,6 @@ export function handleManagerFeeMinted(event: ManagerFeeMintedEvent): void {
   entity.managerFee = event.params.managerFee;
   entity.tokenPriceAtLastFeeMint = event.params.tokenPriceAtLastFeeMint;
   entity.block = event.block.number.toI32();
-  entity.save();
-}
-
-export function handlePoolManagerLogicSet(
-  event: PoolManagerLogicSetEvent
-): void {
-  let entity = new PoolManagerLogicSet(
-    event.transaction.hash.toHex() + '-' + event.logIndex.toString()
-  );
-
-  entity.poolManagerLogic = event.params.poolManagerLogic;
-  entity.from = event.params.from;
-  entity.save();
-}
-
-export function handlePoolPrivacyUpdated(event: PoolPrivacyUpdatedEvent): void {
-  let entity = new PoolPrivacyUpdated(
-    event.transaction.hash.toHex() + '-' + event.logIndex.toString()
-  );
-  entity.isPoolPrivate = event.params.isPoolPrivate;
   entity.save();
 }
 

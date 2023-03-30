@@ -1,16 +1,22 @@
 {
   "name": "dhedge-v2-subgraphs",
+  "description": "Contains dHEDGE V2 subgraphs",
   "license": "MIT",
   "scripts": {
     "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy --product hosted-service dhedge/dhedge-v2-optimism",
-    "create-local": "graph create --node http://localhost:8020/ dhedge/dhedge-v2-optimism",
-    "remove-local": "graph remove --node http://localhost:8020/ dhedge/dhedge-v2-optimism",
-    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 dhedge/dhedge-v2-optimism"
+    "prepare:subgraph": "rm -f subgraph.yaml && cp ./manifests/$NETWORK.subgraph.yaml subgraph.yaml && rm -rf generated && yarn codegen && rm -rf build && yarn build",
+    "prepare:optimism": "NETWORK=optimism env-cmd yarn prepare:subgraph",
+    "prepare:arbitrum": "NETWORK=arbitrum env-cmd yarn prepare:subgraph",
+    "deploy:hosted": "graph deploy --product hosted-service $SLUG --deploy-key $ACCESS_TOKEN",
+    "deploy:optimism": "yarn prepare:optimism && SLUG=dhedge/dhedge-v2-optimism env-cmd yarn deploy:hosted",
+    "deploy:arbitrum": "yarn prepare:arbitrum && SLUG=dhedge/dhedge-v2-arbitrum env-cmd yarn deploy:hosted"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "^0.44.0",
     "@graphprotocol/graph-ts": "^0.29.3"
+  },
+  "devDependencies": {
+    "env-cmd": "^10.1.0"
   }
 }

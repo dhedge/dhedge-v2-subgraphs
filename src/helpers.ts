@@ -7,7 +7,6 @@ import {
 } from '@graphprotocol/graph-ts';
 
 import { ERC20 } from '../generated/templates/PoolLogic/ERC20';
-// import { ERC20NameBytes } from '../generated/templates/PoolLogic/ERC20NameBytes';
 import { PoolLogic } from '../generated/templates/PoolLogic/PoolLogic';
 import { PoolManagerLogic } from '../generated/templates/PoolLogic/PoolManagerLogic';
 import { Pool } from '../generated/schema';
@@ -20,7 +19,6 @@ export let BI_18 = BigInt.fromI32(18);
 export function fetchTokenDecimals(tokenAddress: Address): BigInt {
   let contract = ERC20.bind(tokenAddress);
 
-  // let decimalValue = null;
   let decimalValue = NaN;
   let decimalResult = contract.try_decimals();
   if (!decimalResult.reverted) {
@@ -96,6 +94,5 @@ export function instantiatePool(
     pool.tokenPrice = tryPoolTokenPrice.value;
   }
 
-  // if (pool === null) log.error('pool is null', [pool.id]);
   return pool as Pool;
 }
