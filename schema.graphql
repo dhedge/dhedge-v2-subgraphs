@@ -86,7 +86,7 @@ type Pool @entity {
   manager: Bytes # optional
   managerName: String!
   totalSupply: BigDecimal!
-  tokenPrice: BigInt! # uint256
+  tokenPrice: BigInt # optional
   decimals: BigInt # optional
   deposits: [Deposit!]! @derivedFrom(field: "pool")
   withdrawals: [Withdrawal!]! @derivedFrom(field: "pool")
