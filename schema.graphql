@@ -60,6 +60,7 @@ type Transfer @entity {
   value: BigInt!
   address: String!
   block: Int!
+  blockTimestamp: BigInt!
 }
 
 type Withdrawal @entity {
