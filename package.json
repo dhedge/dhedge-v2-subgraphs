@@ -17,7 +17,7 @@
     "deploy:polygon": "yarn prepare:polygon && SLUG=dhedge/dhedge-v2-polygon env-cmd yarn deploy:hosted",
     "deploy:optimism": "yarn prepare:optimism && SLUG=dhedge/dhedge-v2-optimism env-cmd yarn deploy:hosted",
     "deploy:arbitrum": "yarn prepare:arbitrum && SLUG=dhedge/dhedge-v2-arbitrum env-cmd yarn deploy:hosted",
-    "deploy:base": "yarn prepare:base && SLUG=dhedge-v2-base env-cmd yarn deploy:studio"
+    "deploy:base": "yarn prepare:base && SLUG=dhedge-v2-base-mainnet env-cmd yarn deploy:studio"
   },
   "dependencies": {
     "@graphprotocol/graph-cli": "^0.44.0",
