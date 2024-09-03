@@ -792,19 +792,6 @@
   },
   {
     "inputs": [],
-    "name": "managerName",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "_managerName",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "mintManagerFee",
     "outputs": [],
     "stateMutability": "nonpayable",
