@@ -62,6 +62,7 @@ export function handleManagerFeeMinted(event: ManagerFeeMintedEvent): void {
   entity.managerFee = event.params.managerFee;
   entity.tokenPriceAtLastFeeMint = event.params.tokenPriceAtLastFeeMint;
   entity.block = event.block.number.toI32();
+  entity.blockTimestamp = event.block.timestamp;
   entity.save();
 }
 

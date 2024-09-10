@@ -40,6 +40,7 @@ type ManagerFeeMinted @entity {
   managerFee: BigInt!
   tokenPriceAtLastFeeMint: BigInt!
   block: Int!
+  blockTimestamp: BigInt!
 }
 
 type TransactionExecuted @entity {
