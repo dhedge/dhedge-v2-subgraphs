@@ -39,6 +39,7 @@ type ManagerFeeMinted @entity {
   daoFee: BigInt!
   managerFee: BigInt!
   tokenPriceAtLastFeeMint: BigInt!
+  tokenPriceAtFeeMint: BigInt
   block: Int!
   blockTimestamp: BigInt!
 }
