@@ -1,7 +1,7 @@
 import { dataSource } from '@graphprotocol/graph-ts';
 import {
   Deposit as DepositEvent,
-  ManagerFeeMinted as ManagerFeeMintedEvent,
+  ManagerFeeMinted as ManagerFeeMintedEvent, PoolLogic,
   TransactionExecuted as TransactionExecutedEvent,
   Transfer as TransferEvent,
   Withdrawal as WithdrawalEvent,
@@ -15,6 +15,7 @@ import {
   Withdrawal,
   Investor,
 } from '../generated/schema';
+import { log } from "@graphprotocol/graph-ts/index";
 
 export function handleDeposit(event: DepositEvent): void {
   let entity = new Deposit(
@@ -63,6 +64,18 @@ export function handleManagerFeeMinted(event: ManagerFeeMintedEvent): void {
   entity.tokenPriceAtLastFeeMint = event.params.tokenPriceAtLastFeeMint;
   entity.block = event.block.number.toI32();
   entity.blockTimestamp = event.block.timestamp;
+
+  let poolContract = PoolLogic.bind(event.params.pool);
+  let tryPoolTokenPrice = poolContract.try_tokenPrice();
+  if (tryPoolTokenPrice.reverted) {
+    log.info(
+        'pool token price was reverted in tx hash: {} at blockNumber: {}',
+        [event.transaction.hash.toHex(), event.block.number.toString()]
+    );
+  } else {
+    entity.tokenPriceAtFeeMint = tryPoolTokenPrice.value;
+  }
+
   entity.save();
 }
 
