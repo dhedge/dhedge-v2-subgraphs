@@ -109,6 +109,18 @@ export function handleTransfer(event: TransferEvent): void {
   entity.address = event.address.toHexString();
   entity.block = event.block.number.toI32();
   entity.blockTimestamp = event.block.timestamp
+
+  let poolContract = PoolLogic.bind(event.address);
+  let tryPoolTokenPrice = poolContract.try_tokenPrice();
+  if (tryPoolTokenPrice.reverted) {
+    log.info(
+        'pool token price was reverted in tx hash: {} at blockNumber: {}',
+        [event.transaction.hash.toHex(), event.block.number.toString()]
+    );
+  } else {
+    entity.tokenPrice = tryPoolTokenPrice.value;
+  }
+
   entity.save();
 }
 
