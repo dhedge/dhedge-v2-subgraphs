@@ -61,6 +61,7 @@ type Transfer @entity {
   to: Bytes!
   value: BigInt!
   address: String!
+  tokenPrice: BigInt
   block: Int!
   blockTimestamp: BigInt!
 }
