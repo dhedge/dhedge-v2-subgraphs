@@ -36,7 +36,6 @@ export function handleDeposit(event: DepositEvent): void {
   entity.managerName = pool.managerName;
   entity.poolName = pool.name;
   entity.pool = pool.id;
-
   entity.manager = pool.manager;
   entity.totalSupply = pool.totalSupply;
   entity.uniqueInvestor = investor.id;
@@ -151,9 +150,20 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
   entity.investor = investorAddress;
   entity.valueWithdrawn = event.params.valueWithdrawn;
   entity.fundTokensWithdrawn = event.params.fundTokensWithdrawn;
-  entity.totalInvestorFundTokens = event.params.totalInvestorFundTokens;
   entity.fundValue = event.params.fundValue;
   entity.time = event.params.time;
   entity.block = event.block.number.toI32();
+
+  let poolContract = PoolLogic.bind(event.params.fundAddress);
+  let tryBalanceOf = poolContract.try_balanceOf(investorAddress);
+  if (tryBalanceOf.reverted) {
+    log.info(
+        'investor pool balance was reverted in tx hash: {} at blockNumber: {}',
+        [event.transaction.hash.toHex(), event.block.number.toString()]
+    );
+  } else {
+    entity.totalInvestorFundTokens = tryBalanceOf.value;
+  }
+
   entity.save();
 }

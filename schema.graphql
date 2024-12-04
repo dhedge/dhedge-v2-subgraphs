@@ -72,7 +72,7 @@ type Withdrawal @entity {
   investor: Bytes!
   valueWithdrawn: BigInt!
   fundTokensWithdrawn: BigInt!
-  totalInvestorFundTokens: BigInt!
+  totalInvestorFundTokens: BigInt
   fundValue: BigInt!
   time: BigInt!
   block: Int!
