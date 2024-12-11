@@ -108,3 +108,23 @@ type Investor @entity {
   deposits: [Deposit!]! @derivedFrom(field: "uniqueInvestor")
   withdrawals: [Withdrawal!]! @derivedFrom(field: "uniqueInvestor")
 }
+
+type EntryFeeMinted @entity {
+  id: ID!
+  pool: Bytes!
+  managerAddress: Bytes! # address
+  entryFeeAmount: BigInt!
+  tokenPrice: BigInt
+  blockNumber: Int!
+  time: BigInt!
+}
+
+type ExitFeeMinted @entity {
+  id: ID!
+  pool: Bytes!
+  managerAddress: Bytes! # address
+  exitFeeAmount: BigInt!
+  tokenPrice: BigInt
+  blockNumber: Int!
+  time: BigInt!
+}

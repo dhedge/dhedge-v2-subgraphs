@@ -40,6 +40,8 @@ templates:
         - Transfer
         - Withdrawal
         - Pool
+        - EntryFeeMinted
+        - ExitFeeMinted
       abis:
         - name: PoolLogic
           file: ./abis/PoolLogic.json
@@ -58,4 +60,8 @@ templates:
           handler: handleTransfer
         - event: Withdrawal(address,address,uint256,uint256,uint256,uint256,uint256,(address,uint256,bool)[],uint256)
           handler: handleWithdrawal
+        - event: EntryFeeMinted(address,uint256)
+          handler: handleEntryFeeMinted
+        - event: ExitFeeMinted(address,uint256)
+          handler: handleExitFeeMinted
       file: ./src/pool-logic.ts
