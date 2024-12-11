@@ -97,6 +97,44 @@
       {
         "indexed": false,
         "internalType": "address",
+        "name": "manager",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "entryFeeAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "EntryFeeMinted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "manager",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "exitFeeAmount",
+        "type": "uint256"
+      }
+    ],
+    "name": "ExitFeeMinted",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
         "name": "pool",
         "type": "address"
       },

@@ -1,10 +1,13 @@
 import { dataSource } from '@graphprotocol/graph-ts';
 import {
   Deposit as DepositEvent,
-  ManagerFeeMinted as ManagerFeeMintedEvent, PoolLogic,
+  EntryFeeMinted as EntryFeeMintedEvent,
+  ExitFeeMinted as ExitFeeMintedEvent,
+  ManagerFeeMinted as ManagerFeeMintedEvent,
   TransactionExecuted as TransactionExecutedEvent,
   Transfer as TransferEvent,
   Withdrawal as WithdrawalEvent,
+  PoolLogic,
 } from '../generated/templates/PoolLogic/PoolLogic';
 import { instantiatePool } from './helpers';
 import {
@@ -14,6 +17,8 @@ import {
   Transfer,
   Withdrawal,
   Investor,
+  EntryFeeMinted,
+  ExitFeeMinted,
 } from '../generated/schema';
 import { log } from "@graphprotocol/graph-ts/index";
 
@@ -163,6 +168,56 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
     );
   } else {
     entity.totalInvestorFundTokens = tryBalanceOf.value;
+  }
+
+  entity.save();
+}
+
+export function handleEntryFeeMinted(event: EntryFeeMintedEvent): void {
+  let entity = new EntryFeeMinted(
+      event.transaction.hash.toHex() + '-' + event.logIndex.toString()
+  );
+
+  entity.pool = event.address;
+  entity.managerAddress = event.params.manager;
+  entity.entryFeeAmount = event.params.entryFeeAmount;
+  entity.time = event.block.timestamp;
+  entity.blockNumber = event.block.number.toI32();
+
+  let poolContract = PoolLogic.bind(event.address);
+  let tryPoolTokenPrice = poolContract.try_tokenPrice();
+  if (tryPoolTokenPrice.reverted) {
+    log.info(
+        'pool token price was reverted in tx hash: {} at blockNumber: {}',
+        [event.transaction.hash.toHex(), event.block.number.toString()]
+    );
+  } else {
+    entity.tokenPrice = tryPoolTokenPrice.value;
+  }
+
+  entity.save();
+}
+
+export function handleExitFeeMinted(event: ExitFeeMintedEvent): void {
+  let entity = new ExitFeeMinted(
+      event.transaction.hash.toHex() + '-' + event.logIndex.toString()
+  );
+
+  entity.pool = event.address;
+  entity.managerAddress = event.params.manager;
+  entity.exitFeeAmount = event.params.exitFeeAmount;
+  entity.time = event.block.timestamp;
+  entity.blockNumber = event.block.number.toI32();
+
+  let poolContract = PoolLogic.bind(event.address);
+  let tryPoolTokenPrice = poolContract.try_tokenPrice();
+  if (tryPoolTokenPrice.reverted) {
+    log.info(
+        'pool token price was reverted in tx hash: {} at blockNumber: {}',
+        [event.transaction.hash.toHex(), event.block.number.toString()]
+    );
+  } else {
+    entity.tokenPrice = tryPoolTokenPrice.value;
   }
 
   entity.save();
