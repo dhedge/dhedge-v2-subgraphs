@@ -9,12 +9,10 @@ import {
 import { ERC20 } from '../generated/templates/PoolLogic/ERC20';
 import { PoolLogic } from '../generated/templates/PoolLogic/PoolLogic';
 import { PoolManagerLogic } from '../generated/templates/PoolLogic/PoolManagerLogic';
-import { Pool } from '../generated/schema';
+import { Investment, Pool } from '../generated/schema';
 
 export let ZERO_BI = BigInt.fromI32(0);
 export let ONE_BI = BigInt.fromI32(1);
-export let ZERO_BD = BigDecimal.fromString('0');
-export let BI_18 = BigInt.fromI32(18);
 
 export function fetchTokenDecimals(tokenAddress: Address): BigInt {
   let contract = ERC20.bind(tokenAddress);
@@ -94,4 +92,19 @@ export function instantiatePool(
   }
 
   return pool as Pool;
+}
+
+export function instantiateInvestment(
+  id: string,
+  investorAddress: Address,
+  fundAddress: Address
+): Investment {
+  let investment = Investment.load(id);
+  if (!investment) {
+    investment = new Investment(id);
+    investment.investorAddress = investorAddress;
+    investment.fundAddress = fundAddress;
+    investment.investorBalance = BigInt.zero();
+  }
+  return investment;
 }
