@@ -134,4 +134,5 @@ type Investment @entity {
   investorAddress: Bytes!
   fundAddress: Bytes!
   investorBalance: BigInt!
+  positionOpenTimestamp: BigInt
 }

@@ -1,4 +1,4 @@
-import { dataSource } from '@graphprotocol/graph-ts';
+import { dataSource, BigInt } from '@graphprotocol/graph-ts';
 import {
   Deposit as DepositEvent,
   EntryFeeMinted as EntryFeeMintedEvent,
@@ -41,6 +41,9 @@ export function handleDeposit(event: DepositEvent): void {
 
   let investmentId = investorAddress + event.params.fundAddress.toHexString();
   let investment = instantiateInvestment(investmentId, event.params.investor, event.params.fundAddress);
+  if (investment.investorBalance.equals(BigInt.zero()) && !event.params.totalInvestorFundTokens.equals(BigInt.zero())) {
+    investment.positionOpenTimestamp = event.block.timestamp;
+  }
   investment.investorBalance = event.params.totalInvestorFundTokens;
   investment.save();
 
@@ -148,6 +151,9 @@ export function handleTransfer(event: TransferEvent): void {
             [event.transaction.hash.toHex(), event.block.number.toString()]
         );
       } else {
+        if (!investmentFrom.investorBalance.equals(BigInt.zero()) && tryInvestorFromBalanceOf.value.equals(BigInt.zero())) {
+          investmentFrom.positionOpenTimestamp = null;
+        }
         investmentFrom.investorBalance = tryInvestorFromBalanceOf.value;
         investmentFrom.save();
       }
@@ -161,6 +167,9 @@ export function handleTransfer(event: TransferEvent): void {
       } else {
         let investmentId = investorToAddress.toHexString() + event.address.toHexString();
         let investment = instantiateInvestment(investmentId, event.params.to, event.address);
+        if (investment.investorBalance.equals(BigInt.zero()) && !tryInvestorToBalanceOf.value.equals(BigInt.zero())) {
+          investment.positionOpenTimestamp = event.block.timestamp;
+        }
         investment.investorBalance = tryInvestorToBalanceOf.value;
         investment.save();
       }
@@ -211,6 +220,9 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
     let investmentId = investorAddress.toHexString() + event.params.fundAddress.toHexString();
     let investment = Investment.load(investmentId);
     if (investment) {
+      if (!investment.investorBalance.equals(BigInt.zero()) && tryBalanceOf.value.equals(BigInt.zero())) {
+        investment.positionOpenTimestamp = null;
+      }
       investment.investorBalance = tryBalanceOf.value;
       investment.save();
     }
@@ -228,6 +240,9 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
       let investmentId = potentialInvestorAddress.toHexString() + event.params.fundAddress.toHexString();
       let investment = Investment.load(investmentId);
       if (investment) {
+        if (!investment.investorBalance.equals(BigInt.zero()) && tryPotentialInvestorBalanceOf.value.equals(BigInt.zero())) {
+          investment.positionOpenTimestamp = null;
+        }
         investment.investorBalance = tryPotentialInvestorBalanceOf.value;
         investment.save();
       }
