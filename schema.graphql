@@ -128,3 +128,100 @@ type ExitFeeMinted @entity {
   blockNumber: Int!
   time: BigInt!
 }
+
+type AuthorizedKeeperAdded @entity {
+  id: ID!
+  keeper: Bytes!
+  blockNumber: Int!
+  time: BigInt!
+}
+
+type AuthorizedKeeperRemoved @entity {
+  id: ID!
+  keeper: Bytes!
+  blockNumber: Int!
+  time: BigInt!
+}
+
+type LimitOrderCreated @entity {
+  id: ID!
+  user: Bytes!
+  pool: Bytes!
+  orderId: Bytes! # uint256
+  blockNumber: Int!
+  time: BigInt!
+}
+
+#type LimitOrderDeleted @entity {
+#  id: ID!
+#  user: Bytes!
+#  pool: Bytes!
+#  orderId: Int!
+#  blockNumber: Int!
+#  time: BigInt!
+#}
+#
+#type LimitOrderExecuted @entity {
+#  id: ID!
+#  user: Bytes!
+#  pool: Bytes!
+#  orderId: Int!
+#  blockNumber: Int!
+#  time: BigInt!
+#}
+
+type LimitOrderModified @entity {
+  id: ID!
+  user: Bytes!
+  pool: Bytes!
+  orderId: Bytes!
+  blockNumber: Int!
+  time: BigInt!
+}
+
+type SettlementOrderCreated @entity {
+  id: ID!
+  user: Bytes!
+  blockNumber: Int!
+  time: BigInt!
+}
+
+type LimitOrder @entity {
+  id: Bytes!
+  user: Bytes!
+  pool: Bytes!
+#  orderId: Bytes!
+  takeProfitPrice: BigInt!
+  stopLossPrice: BigInt!
+  amount: BigInt!
+  pricingAsset: Bytes!
+  status: Int!
+  closePrice: BigInt
+  blockNumberCreated: Int!
+  blockNumberUpdated: Int!
+  timeCreated: BigInt!
+  timeUpdated: BigInt!
+}
+
+
+#type SettlementOrderDeleted @entity {
+#  id: ID!
+#  user: Bytes!
+#  blockNumber: Int!
+#  time: BigInt!
+#}
+#
+#type SettlementOrderExecuted @entity {
+#  id: ID!
+#  user: Bytes!
+#  destTokenAmountReceived: BigInt!
+#  blockNumber: Int!
+#  time: BigInt!
+#}
+#
+#type SettlementTokenSet @entity {
+#  id: ID!
+#  token: Bytes!
+#  blockNumber: Int!
+#  time: BigInt!
+#}

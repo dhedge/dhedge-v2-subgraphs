@@ -95,3 +95,54 @@ export function instantiatePool(
 
   return pool as Pool;
 }
+
+export function instantiateLimitOrder(
+    id: string,
+    fundAddress: Address,
+    event: ethereum.Event
+): Pool {
+  let pool = Pool.load(id);
+  let poolContract = PoolLogic.bind(fundAddress);
+  let poolTokenDecimals = fetchTokenDecimals(fundAddress);
+
+  if (!pool) {
+    pool = new Pool(id);
+    pool.fundAddress = fundAddress;
+  }
+
+  // Manager Logic
+  let managerContract = PoolManagerLogic.bind(poolContract.poolManagerLogic());
+
+  // Pool Entity
+  let tryPoolName = poolContract.try_name();
+  if (tryPoolName.reverted) {
+    log.info('pool name was reverted in tx hash: {} at blockNumber: {}', [
+      event.transaction.hash.toHex(),
+      event.block.number.toString(),
+    ]);
+  } else {
+    pool.name = tryPoolName.value;
+  }
+
+  pool.manager = managerContract.manager();
+  pool.managerName = managerContract.managerName();
+  pool.decimals = poolTokenDecimals;
+
+  let poolSupply = convertTokenToDecimal(
+      poolContract.totalSupply(),
+      poolTokenDecimals
+  );
+  pool.totalSupply = poolSupply;
+
+  let tryPoolTokenPrice = poolContract.try_tokenPrice();
+  if (tryPoolTokenPrice.reverted) {
+    log.info(
+        'pool token price was reverted in tx hash: {} at blockNumber: {}',
+        [event.transaction.hash.toHex(), event.block.number.toString()]
+    );
+  } else {
+    pool.tokenPrice = tryPoolTokenPrice.value;
+  }
+
+  return pool as Pool;
+}

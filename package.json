@@ -20,8 +20,8 @@
     "deploy:base": "yarn prepare:base && SLUG=dhedge-v2-base-mainnet env-cmd yarn deploy:studio"
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "^0.44.0",
-    "@graphprotocol/graph-ts": "^0.29.3"
+    "@graphprotocol/graph-cli": "^0.96.0",
+    "@graphprotocol/graph-ts": "^0.38.0"
   },
   "devDependencies": {
     "env-cmd": "^10.1.0"
