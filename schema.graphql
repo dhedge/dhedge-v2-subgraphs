@@ -87,24 +87,24 @@ type Pool @entity {
   id: ID!
   fundAddress: Bytes!
   name: String!
-  manager: Bytes # optional
+  manager: Bytes
   managerName: String!
   totalSupply: BigDecimal!
-  tokenPrice: BigInt # optional
-  decimals: BigInt # optional
+  tokenPrice: BigInt
+  decimals: BigInt
   deposits: [Deposit!]! @derivedFrom(field: "pool")
   withdrawals: [Withdrawal!]! @derivedFrom(field: "pool")
 }
 
 type Manager @entity {
   id: ID!
-  managerAddress: Bytes! # address
+  managerAddress: Bytes!
   fundCreated: [FundCreated!]! @derivedFrom(field: "uniqueManager")
 }
 
 type Investor @entity {
   id: ID!
-  investorAddress: Bytes! # address
+  investorAddress: Bytes!
   deposits: [Deposit!]! @derivedFrom(field: "uniqueInvestor")
   withdrawals: [Withdrawal!]! @derivedFrom(field: "uniqueInvestor")
 }
@@ -112,7 +112,7 @@ type Investor @entity {
 type EntryFeeMinted @entity {
   id: ID!
   pool: Bytes!
-  managerAddress: Bytes! # address
+  managerAddress: Bytes!
   entryFeeAmount: BigInt!
   tokenPrice: BigInt
   blockNumber: Int!
@@ -122,11 +122,19 @@ type EntryFeeMinted @entity {
 type ExitFeeMinted @entity {
   id: ID!
   pool: Bytes!
-  managerAddress: Bytes! # address
+  managerAddress: Bytes!
   exitFeeAmount: BigInt!
   tokenPrice: BigInt
   blockNumber: Int!
   time: BigInt!
+}
+
+type Investment @entity {
+  id: ID!
+  investorAddress: Bytes!
+  fundAddress: Bytes!
+  investorBalance: BigInt!
+  positionOpenTimestamp: BigInt
 }
 
 type AuthorizedKeeperAdded @entity {

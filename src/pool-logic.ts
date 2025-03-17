@@ -1,4 +1,4 @@
-import { dataSource } from '@graphprotocol/graph-ts';
+import { dataSource, BigInt } from '@graphprotocol/graph-ts';
 import {
   Deposit as DepositEvent,
   EntryFeeMinted as EntryFeeMintedEvent,
@@ -9,7 +9,7 @@ import {
   Withdrawal as WithdrawalEvent,
   PoolLogic,
 } from '../generated/templates/PoolLogic/PoolLogic';
-import { instantiatePool } from './helpers';
+import { instantiateInvestment, instantiatePool } from './helpers';
 import {
   Deposit,
   ManagerFeeMinted,
@@ -19,6 +19,7 @@ import {
   Investor,
   EntryFeeMinted,
   ExitFeeMinted,
+  Investment,
 } from '../generated/schema';
 import { log } from "@graphprotocol/graph-ts/index";
 
@@ -37,6 +38,14 @@ export function handleDeposit(event: DepositEvent): void {
     investor.investorAddress = event.params.investor;
   }
   investor.save();
+
+  let investmentId = investorAddress + event.params.fundAddress.toHexString();
+  let investment = instantiateInvestment(investmentId, event.params.investor, event.params.fundAddress);
+  if (investment.investorBalance.equals(BigInt.zero()) && !event.params.totalInvestorFundTokens.equals(BigInt.zero())) {
+    investment.positionOpenTimestamp = event.block.timestamp;
+  }
+  investment.investorBalance = event.params.totalInvestorFundTokens;
+  investment.save();
 
   entity.managerName = pool.managerName;
   entity.poolName = pool.name;
@@ -126,6 +135,46 @@ export function handleTransfer(event: TransferEvent): void {
   }
 
   entity.save();
+
+  if (event.params.from.toHexString() !== "0x0000000000000000000000000000000000000000"
+      && event.params.to.toHexString() !== "0x0000000000000000000000000000000000000000") {
+    const investorFromAddress = event.params.from;
+    const investorToAddress = event.params.to;
+
+    let investmentFromId = investorFromAddress.toHexString() + event.address.toHexString();
+    let investmentFrom = Investment.load(investmentFromId);
+    if (investmentFrom) {
+      let tryInvestorFromBalanceOf = poolContract.try_balanceOf(investorFromAddress);
+      if (tryInvestorFromBalanceOf.reverted) {
+        log.info(
+            'investor pool balance was reverted in tx hash: {} at blockNumber: {}',
+            [event.transaction.hash.toHex(), event.block.number.toString()]
+        );
+      } else {
+        if (!investmentFrom.investorBalance.equals(BigInt.zero()) && tryInvestorFromBalanceOf.value.equals(BigInt.zero())) {
+          investmentFrom.positionOpenTimestamp = null;
+        }
+        investmentFrom.investorBalance = tryInvestorFromBalanceOf.value;
+        investmentFrom.save();
+      }
+
+      let tryInvestorToBalanceOf = poolContract.try_balanceOf(investorToAddress);
+      if (tryInvestorToBalanceOf.reverted) {
+        log.info(
+            'investor pool balance was reverted in tx hash: {} at blockNumber: {}',
+            [event.transaction.hash.toHex(), event.block.number.toString()]
+        );
+      } else {
+        let investmentId = investorToAddress.toHexString() + event.address.toHexString();
+        let investment = instantiateInvestment(investmentId, event.params.to, event.address);
+        if (investment.investorBalance.equals(BigInt.zero()) && !tryInvestorToBalanceOf.value.equals(BigInt.zero())) {
+          investment.positionOpenTimestamp = event.block.timestamp;
+        }
+        investment.investorBalance = tryInvestorToBalanceOf.value;
+        investment.save();
+      }
+    }
+  }
 }
 
 export function handleWithdrawal(event: WithdrawalEvent): void {
@@ -168,6 +217,36 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
     );
   } else {
     entity.totalInvestorFundTokens = tryBalanceOf.value;
+    let investmentId = investorAddress.toHexString() + event.params.fundAddress.toHexString();
+    let investment = Investment.load(investmentId);
+    if (investment) {
+      if (!investment.investorBalance.equals(BigInt.zero()) && tryBalanceOf.value.equals(BigInt.zero())) {
+        investment.positionOpenTimestamp = null;
+      }
+      investment.investorBalance = tryBalanceOf.value;
+      investment.save();
+    }
+  }
+
+  if (event.transaction.from !== event.params.investor) {
+    const potentialInvestorAddress = event.params.investor;
+    let tryPotentialInvestorBalanceOf = poolContract.try_balanceOf(potentialInvestorAddress);
+    if (tryPotentialInvestorBalanceOf.reverted) {
+      log.info(
+          'investor pool balance was reverted in tx hash: {} at blockNumber: {}',
+          [event.transaction.hash.toHex(), event.block.number.toString()]
+      );
+    } else {
+      let investmentId = potentialInvestorAddress.toHexString() + event.params.fundAddress.toHexString();
+      let investment = Investment.load(investmentId);
+      if (investment) {
+        if (!investment.investorBalance.equals(BigInt.zero()) && tryPotentialInvestorBalanceOf.value.equals(BigInt.zero())) {
+          investment.positionOpenTimestamp = null;
+        }
+        investment.investorBalance = tryPotentialInvestorBalanceOf.value;
+        investment.save();
+      }
+    }
   }
 
   entity.save();
