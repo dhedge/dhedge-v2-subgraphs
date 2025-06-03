@@ -38,16 +38,13 @@ dataSources:
         - AuthorizedKeeperAdded
         - AuthorizedKeeperRemoved
         - LimitOrderCreated
-#        - LimitOrderDeleted
-#        - LimitOrderExecuted
         - LimitOrderModified
         - SettlementOrderCreated
-#        - SettlementOrderDeleted
-#        - SettlementOrderExecuted
-#        - SettlementTokenSet
       abis:
         - name: PoolLimitOrderManager
           file: ./abis/PoolLimitOrderManager.json
+        - name: PoolFactoryMoonlight
+          file: ./abis/PoolFactoryMoonlight.json
       eventHandlers:
         - event: AuthorizedKeeperAdded(address)
           handler: handleAuthorizedKeeperAdded
@@ -63,12 +60,6 @@ dataSources:
           handler: handleLimitOrderModified
         - event: SettlementOrderCreated(indexed address)
           handler: handleSettlementOrderCreated
-#        - event: SettlementOrderDeleted(indexed address)
-#          handler: handleSettlementOrderDeleted
-#        - event: SettlementOrderExecuted(indexed address,uint256)
-#          handler: handleSettlementOrderExecuted
-#        - event: SettlementTokenSet(address)
-#          handler: handleSettlementTokenSet
       file: ./src/pool-limit-order-manager.ts
 
 templates:

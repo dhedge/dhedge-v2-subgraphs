@@ -1,4 +1,4 @@
-import { log } from '@graphprotocol/graph-ts';
+import {Address, log} from '@graphprotocol/graph-ts';
 
 import {
     AuthorizedKeeperAdded as AuthorizedKeeperAddedEvent,
@@ -16,7 +16,8 @@ import {
     LimitOrderCreated,
     LimitOrderModified, SettlementOrderCreated
 } from "../generated/schema";
-import { PoolLogic } from "../generated/templates/PoolLogic/PoolLogic";
+import { PoolFactoryMoonlight } from "../generated/PoolFactoryMoonlight/PoolFactoryMoonlight";
+import { POOL_FACTORY_ADDRESS } from "./addresses";
 
 export function handleAuthorizedKeeperAdded(event: AuthorizedKeeperAddedEvent): void {
     let entity = new AuthorizedKeeperAdded(
@@ -65,7 +66,7 @@ export function handleLimitOrderCreated(event: LimitOrderCreatedEvent): void {
     limitOrder.blockNumberUpdated = event.block.number.toI32();
     limitOrder.timeUpdated = event.block.timestamp;
 
-    let limitOrderManagerContract = PoolLimitOrderManager.bind(event.params.pool);
+    let limitOrderManagerContract = PoolLimitOrderManager.bind(event.address);
     let tryLimitOrderInfo = limitOrderManagerContract.try_limitOrders(orderId);
     if (tryLimitOrderInfo.reverted) {
         log.info(
@@ -95,21 +96,27 @@ export function handleLimitOrderDeleted(event: LimitOrderDeletedEvent): void {
 export function handleLimitOrderExecuted(event: LimitOrderExecutedEvent): void {
     let limitOrder = LimitOrder.load(event.params.id);
     if (limitOrder) {
-        const poolAddress = event.params.pool;
-        let poolContract = PoolLogic.bind(poolAddress);
-        let tryPoolTokenPrice = poolContract.try_tokenPrice();
-        if (tryPoolTokenPrice.reverted) {
-            log.info(
-                'pool token price was reverted in tx hash: {} at blockNumber: {}',
-                [event.transaction.hash.toHex(), event.block.number.toString()]
-            );
-        } else {
-            limitOrder.closePrice = tryPoolTokenPrice.value;
-        }
-
         limitOrder.blockNumberUpdated = event.block.number.toI32();
         limitOrder.timeUpdated = event.block.timestamp;
         limitOrder.status = 1;
+
+        let poolFactoryContract = PoolFactoryMoonlight.bind(Address.fromString(POOL_FACTORY_ADDRESS));
+
+        const pricingAsset = limitOrder.pricingAsset;
+
+        if (pricingAsset !== null) {
+            const tryPricingAssetPrice = poolFactoryContract.try_getAssetPrice(Address.fromBytes(pricingAsset));
+
+            if (tryPricingAssetPrice.reverted) {
+                log.info(
+                    'getAssetPrice was reverted in tx hash: {} at blockNumber: {}',
+                    [event.transaction.hash.toHex(), event.block.number.toString()]
+                );
+            } else {
+                limitOrder.closePrice = tryPricingAssetPrice.value;
+            }
+        }
+
         limitOrder.save();
     }
 }
@@ -128,7 +135,7 @@ export function handleLimitOrderModified(event: LimitOrderModifiedEvent): void {
     const orderId = event.params.id;
     let limitOrder = LimitOrder.load(orderId);
     if (limitOrder) {
-        let limitOrderManagerContract = PoolLimitOrderManager.bind(event.params.pool);
+        let limitOrderManagerContract = PoolLimitOrderManager.bind(event.address);
         let tryLimitOrderInfo = limitOrderManagerContract.try_limitOrders(orderId);
         if (tryLimitOrderInfo.reverted) {
             log.info(
