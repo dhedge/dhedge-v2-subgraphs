@@ -1,4 +1,4 @@
-type FundCreated @entity {
+type FundCreated @entity(immutable: true) {
   id: ID!
   fundAddress: Bytes! # address
   isPoolPrivate: Boolean! # bool
@@ -12,7 +12,7 @@ type FundCreated @entity {
   uniqueManager: Manager!
 }
 
-type Deposit @entity {
+type Deposit @entity(immutable: true) {
   id: ID!
   fundAddress: Bytes!
   investor: Bytes!
@@ -31,7 +31,7 @@ type Deposit @entity {
   uniqueInvestor: Investor!
 }
 
-type ManagerFeeMinted @entity {
+type ManagerFeeMinted @entity(immutable: true) {
   id: ID!
   pool: Bytes!
   manager: Bytes!
@@ -44,7 +44,7 @@ type ManagerFeeMinted @entity {
   blockTimestamp: BigInt!
 }
 
-type TransactionExecuted @entity {
+type TransactionExecuted @entity(immutable: true) {
   id: ID!
   pool: Bytes!
   manager: Bytes!
@@ -55,7 +55,7 @@ type TransactionExecuted @entity {
   managerName: String!
 }
 
-type Transfer @entity {
+type Transfer @entity(immutable: true) {
   id: ID!
   from: Bytes!
   to: Bytes!
@@ -66,7 +66,7 @@ type Transfer @entity {
   blockTimestamp: BigInt!
 }
 
-type Withdrawal @entity {
+type Withdrawal @entity(immutable: true) {
   id: ID!
   fundAddress: Bytes!
   investor: Bytes!
@@ -83,7 +83,7 @@ type Withdrawal @entity {
   managerName: String!
 }
 
-type Pool @entity {
+type Pool @entity(immutable: false) {
   id: ID!
   fundAddress: Bytes!
   name: String!
@@ -96,20 +96,20 @@ type Pool @entity {
   withdrawals: [Withdrawal!]! @derivedFrom(field: "pool")
 }
 
-type Manager @entity {
+type Manager @entity(immutable: false) {
   id: ID!
   managerAddress: Bytes! # address
   fundCreated: [FundCreated!]! @derivedFrom(field: "uniqueManager")
 }
 
-type Investor @entity {
+type Investor @entity(immutable: false) {
   id: ID!
   investorAddress: Bytes! # address
   deposits: [Deposit!]! @derivedFrom(field: "uniqueInvestor")
   withdrawals: [Withdrawal!]! @derivedFrom(field: "uniqueInvestor")
 }
 
-type EntryFeeMinted @entity {
+type EntryFeeMinted @entity(immutable: true) {
   id: ID!
   pool: Bytes!
   managerAddress: Bytes! # address
@@ -119,7 +119,7 @@ type EntryFeeMinted @entity {
   time: BigInt!
 }
 
-type ExitFeeMinted @entity {
+type ExitFeeMinted @entity(immutable: true) {
   id: ID!
   pool: Bytes!
   managerAddress: Bytes! # address
