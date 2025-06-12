@@ -156,6 +156,7 @@ type LimitOrderCreated @entity(immutable: true) {
   user: Bytes!
   pool: Bytes!
   orderId: Bytes! # uint256
+  transactionHash: Bytes!
   blockNumber: Int!
   time: BigInt!
 }
@@ -165,6 +166,27 @@ type LimitOrderModified @entity(immutable: true) {
   user: Bytes!
   pool: Bytes!
   orderId: Bytes!
+  transactionHash: Bytes!
+  blockNumber: Int!
+  time: BigInt!
+}
+
+type LimitOrderExecuted @entity(immutable: true) {
+  id: ID!
+  user: Bytes!
+  pool: Bytes!
+  orderId: Bytes!
+  transactionHash: Bytes!
+  blockNumber: Int!
+  time: BigInt!
+}
+
+type LimitOrderDeleted @entity(immutable: true) {
+  id: ID!
+  user: Bytes!
+  pool: Bytes!
+  orderId: Bytes!
+  transactionHash: Bytes!
   blockNumber: Int!
   time: BigInt!
 }
@@ -172,6 +194,17 @@ type LimitOrderModified @entity(immutable: true) {
 type SettlementOrderCreated @entity(immutable: true) {
   id: ID!
   user: Bytes!
+  blockNumber: Int!
+  time: BigInt!
+}
+
+type LimitOrderExecutedPartially @entity(immutable: true) {
+  id: ID!
+  user: Bytes!
+  pool: Bytes!
+  orderId: Bytes!
+  amount: BigInt!
+  transactionHash: Bytes!
   blockNumber: Int!
   time: BigInt!
 }
@@ -184,6 +217,7 @@ type LimitOrder @entity(immutable: false) {
   stopLossPrice: BigInt
   closePrice: BigInt
   amount: BigInt
+  partiallyExecutedAmount: BigInt
   pricingAsset: Bytes
   status: Int!
   blockNumberCreated: Int!

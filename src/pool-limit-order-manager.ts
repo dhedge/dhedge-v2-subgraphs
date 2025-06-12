@@ -1,4 +1,4 @@
-import {Address, log} from '@graphprotocol/graph-ts';
+import {Address, BigInt, log} from '@graphprotocol/graph-ts';
 
 import {
     AuthorizedKeeperAdded as AuthorizedKeeperAddedEvent,
@@ -6,15 +6,18 @@ import {
     LimitOrderCreated as LimitOrderCreatedEvent,
     LimitOrderDeleted as LimitOrderDeletedEvent,
     LimitOrderExecuted as LimitOrderExecutedEvent,
-    LimitOrderModified as LimitOrderModifiedEvent, PoolLimitOrderManager,
+    LimitOrderModified as LimitOrderModifiedEvent,
     SettlementOrderCreated as SettlementOrderCreatedEvent,
+    LimitOrderExecutedPartially as LimitOrderExecutedPartiallyEvent,
+    PoolLimitOrderManager,
 } from "../generated/PoolLimitOrderManager/PoolLimitOrderManager";
 
 import {
     AuthorizedKeeperAdded,
     AuthorizedKeeperRemoved, LimitOrder,
-    LimitOrderCreated,
-    LimitOrderModified, SettlementOrderCreated
+    LimitOrderCreated, LimitOrderDeleted, LimitOrderExecuted,
+    LimitOrderModified, LimitOrderExecutedPartially,
+    SettlementOrderCreated
 } from "../generated/schema";
 import { PoolFactoryMoonlight } from "../generated/PoolFactoryMoonlight/PoolFactoryMoonlight";
 import { POOL_FACTORY_ADDRESS } from "./addresses";
@@ -46,6 +49,7 @@ export function handleLimitOrderCreated(event: LimitOrderCreatedEvent): void {
     entity.user = event.params.user;
     entity.pool = event.params.pool;
     entity.orderId = event.params.id;
+    entity.transactionHash = event.transaction.hash;
     entity.time = event.block.timestamp;
     entity.blockNumber = event.block.number.toI32();
     entity.save();
@@ -57,6 +61,7 @@ export function handleLimitOrderCreated(event: LimitOrderCreatedEvent): void {
         limitOrder.id = event.params.id;
         limitOrder.user = event.params.user;
         limitOrder.pool = event.params.pool;
+        limitOrder.partiallyExecutedAmount = BigInt.zero();
 
         limitOrder.blockNumberCreated = event.block.number.toI32();
         limitOrder.timeCreated = event.block.timestamp;
@@ -84,6 +89,17 @@ export function handleLimitOrderCreated(event: LimitOrderCreatedEvent): void {
 }
 
 export function handleLimitOrderDeleted(event: LimitOrderDeletedEvent): void {
+    let entity = new LimitOrderDeleted(
+        event.transaction.hash.toHex() + '-' + event.logIndex.toString()
+    );
+    entity.user = event.params.user;
+    entity.pool = event.params.pool;
+    entity.orderId = event.params.id;
+    entity.transactionHash = event.transaction.hash;
+    entity.time = event.block.timestamp;
+    entity.blockNumber = event.block.number.toI32();
+    entity.save();
+
     let limitOrder = LimitOrder.load(event.params.id);
     if (limitOrder && limitOrder.status !== 1) {
         limitOrder.status = 2;
@@ -94,6 +110,17 @@ export function handleLimitOrderDeleted(event: LimitOrderDeletedEvent): void {
 }
 
 export function handleLimitOrderExecuted(event: LimitOrderExecutedEvent): void {
+    let entity = new LimitOrderExecuted(
+        event.transaction.hash.toHex() + '-' + event.logIndex.toString()
+    );
+    entity.user = event.params.user;
+    entity.pool = event.params.pool;
+    entity.orderId = event.params.id;
+    entity.transactionHash = event.transaction.hash;
+    entity.time = event.block.timestamp;
+    entity.blockNumber = event.block.number.toI32();
+    entity.save();
+
     let limitOrder = LimitOrder.load(event.params.id);
     if (limitOrder) {
         limitOrder.blockNumberUpdated = event.block.number.toI32();
@@ -121,6 +148,31 @@ export function handleLimitOrderExecuted(event: LimitOrderExecutedEvent): void {
     }
 }
 
+export function handleLimitOrderExecutedPartially(event: LimitOrderExecutedPartiallyEvent): void {
+    let entity = new LimitOrderExecutedPartially(
+        event.transaction.hash.toHex() + '-' + event.logIndex.toString()
+    );
+    entity.user = event.params.user;
+    entity.pool = event.params.pool;
+    entity.orderId = event.params.id;
+    entity.amount = event.params.amount;
+    entity.transactionHash = event.transaction.hash;
+    entity.time = event.block.timestamp;
+    entity.blockNumber = event.block.number.toI32();
+    entity.save();
+
+    let limitOrder = LimitOrder.load(event.params.id);
+    if (limitOrder) {
+        const partiallyExecutedAmount = limitOrder.partiallyExecutedAmount;
+        limitOrder.partiallyExecutedAmount = partiallyExecutedAmount === null
+            ? event.params.amount
+            : partiallyExecutedAmount.plus(event.params.amount);
+        limitOrder.blockNumberUpdated = event.block.number.toI32();
+        limitOrder.timeUpdated = event.block.timestamp;
+        limitOrder.save();
+    }
+}
+
 export function handleLimitOrderModified(event: LimitOrderModifiedEvent): void {
     let entity = new LimitOrderModified(
         event.transaction.hash.toHex() + '-' + event.logIndex.toString()
@@ -128,6 +180,7 @@ export function handleLimitOrderModified(event: LimitOrderModifiedEvent): void {
     entity.user = event.params.user;
     entity.pool = event.params.pool;
     entity.orderId = event.params.id;
+    entity.transactionHash = event.transaction.hash;
     entity.time = event.block.timestamp;
     entity.blockNumber = event.block.number.toI32();
     entity.save();
