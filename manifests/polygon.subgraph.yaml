@@ -59,6 +59,10 @@ dataSources:
         - LimitOrderCreated
         - LimitOrderModified
         - SettlementOrderCreated
+        - LimitOrder
+        - LimitOrderExecuted
+        - LimitOrderDeleted
+        - LimitOrderExecutedPartially
       abis:
         - name: PoolLimitOrderManager
           file: ./abis/PoolLimitOrderManager.json
@@ -79,6 +83,8 @@ dataSources:
           handler: handleLimitOrderModified
         - event: SettlementOrderCreated(indexed address)
           handler: handleSettlementOrderCreated
+        - event: LimitOrderExecutedPartially(indexed address,indexed address,bytes32,uint256)
+          handler: handleLimitOrderExecutedPartially
       file: ./src/pool-limit-order-manager.ts
 
 templates:
