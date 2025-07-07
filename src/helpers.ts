@@ -4,12 +4,13 @@ import {
   BigInt,
   BigDecimal,
   ethereum,
+  store,
 } from '@graphprotocol/graph-ts';
 
 import { ERC20 } from '../generated/templates/PoolLogic/ERC20';
 import { PoolLogic } from '../generated/templates/PoolLogic/PoolLogic';
 import { PoolManagerLogic } from '../generated/templates/PoolLogic/PoolManagerLogic';
-import { Investment, Pool } from '../generated/schema';
+import {Investment, LimitOrder, Pool} from '../generated/schema';
 
 export let ZERO_BI = BigInt.fromI32(0);
 export let ONE_BI = BigInt.fromI32(1);
@@ -156,4 +157,27 @@ export function instantiateLimitOrder(
   }
 
   return pool as Pool;
+}
+
+export function archiveLimitOrder(limitOrder: LimitOrder): void {
+  const limitOrderToArchive = new LimitOrder(limitOrder.id + "-" + limitOrder.index.toString());
+
+  limitOrderToArchive.orderId = limitOrder.orderId;
+  limitOrderToArchive.index = limitOrder.index;
+  limitOrderToArchive.user = limitOrder.user;
+  limitOrderToArchive.pool = limitOrder.pool;
+  limitOrderToArchive.partiallyExecutedAmount = limitOrder.partiallyExecutedAmount;
+  limitOrderToArchive.blockNumberCreated = limitOrder.blockNumberCreated;
+  limitOrderToArchive.timeCreated = limitOrder.timeCreated;
+  limitOrderToArchive.blockNumberUpdated = limitOrder.blockNumberUpdated;
+  limitOrderToArchive.timeUpdated = limitOrder.timeUpdated;
+  limitOrderToArchive.status = limitOrder.status;
+  limitOrderToArchive.takeProfitPrice = limitOrder.takeProfitPrice;
+  limitOrderToArchive.stopLossPrice = limitOrder.stopLossPrice;
+  limitOrderToArchive.closePrice = limitOrder.closePrice;
+  limitOrderToArchive.pricingAsset = limitOrder.pricingAsset;
+  limitOrderToArchive.amount = limitOrder.amount;
+
+  store.remove("LimitOrder", limitOrder.id);
+  limitOrderToArchive.save();
 }
