@@ -1,4 +1,4 @@
-import {Address, BigInt, log} from '@graphprotocol/graph-ts';
+import { Address, BigInt, log, store } from '@graphprotocol/graph-ts';
 
 import {
     AuthorizedKeeperAdded as AuthorizedKeeperAddedEvent,
@@ -55,10 +55,9 @@ export function handleLimitOrderCreated(event: LimitOrderCreatedEvent): void {
     entity.save();
 
     const orderId = event.params.id;
-    let limitOrder = LimitOrder.load(orderId);
+    let limitOrder = LimitOrder.load(orderId.toHex());
     if (!limitOrder) {
-        limitOrder = new LimitOrder(orderId);
-        limitOrder.id = event.params.id;
+        limitOrder = new LimitOrder(orderId.toHex());
         limitOrder.user = event.params.user;
         limitOrder.pool = event.params.pool;
         limitOrder.partiallyExecutedAmount = BigInt.zero();
@@ -92,6 +91,7 @@ export function handleLimitOrderDeleted(event: LimitOrderDeletedEvent): void {
     let entity = new LimitOrderDeleted(
         event.transaction.hash.toHex() + '-' + event.logIndex.toString()
     );
+    event.receipt?.logs
     entity.user = event.params.user;
     entity.pool = event.params.pool;
     entity.orderId = event.params.id;
@@ -100,7 +100,7 @@ export function handleLimitOrderDeleted(event: LimitOrderDeletedEvent): void {
     entity.blockNumber = event.block.number.toI32();
     entity.save();
 
-    let limitOrder = LimitOrder.load(event.params.id);
+    let limitOrder = LimitOrder.load(event.params.id.toHex());
     if (limitOrder && limitOrder.status !== 1) {
         limitOrder.status = 2;
         limitOrder.blockNumberUpdated = event.block.number.toI32();
@@ -121,7 +121,7 @@ export function handleLimitOrderExecuted(event: LimitOrderExecutedEvent): void {
     entity.blockNumber = event.block.number.toI32();
     entity.save();
 
-    let limitOrder = LimitOrder.load(event.params.id);
+    let limitOrder = LimitOrder.load(event.params.id.toHex());
     if (limitOrder) {
         limitOrder.blockNumberUpdated = event.block.number.toI32();
         limitOrder.timeUpdated = event.block.timestamp;
@@ -144,7 +144,26 @@ export function handleLimitOrderExecuted(event: LimitOrderExecutedEvent): void {
             }
         }
 
-        limitOrder.save();
+        const limitOrderToArchive = new LimitOrder(limitOrder.id + '-' + limitOrder.index);
+        limitOrderToArchive.orderId = limitOrder.orderId;
+        limitOrderToArchive.index = limitOrder.index;
+        limitOrderToArchive.user = limitOrder.user;
+        limitOrderToArchive.pool = limitOrder.pool;
+        limitOrderToArchive.partiallyExecutedAmount = limitOrder.partiallyExecutedAmount;
+        limitOrderToArchive.blockNumberCreated = limitOrder.blockNumberCreated;
+        limitOrderToArchive.timeCreated = limitOrder.timeCreated;
+        limitOrderToArchive.blockNumberUpdated = limitOrder.blockNumberUpdated;
+        limitOrderToArchive.timeUpdated = limitOrder.timeUpdated;
+        limitOrderToArchive.status = limitOrder.status;
+
+        limitOrderToArchive.takeProfitPrice = limitOrder.takeProfitPrice;
+        limitOrderToArchive.stopLossPrice = limitOrder.stopLossPrice;
+        limitOrderToArchive.closePrice = limitOrder.closePrice;
+        limitOrderToArchive.pricingAsset = limitOrder.pricingAsset;
+        limitOrderToArchive.amount = limitOrder.amount;
+
+        store.remove('LimitOrder', limitOrder.orderId.toHex());
+        limitOrderToArchive.save();
     }
 }
 
@@ -161,7 +180,7 @@ export function handleLimitOrderExecutedPartially(event: LimitOrderExecutedParti
     entity.blockNumber = event.block.number.toI32();
     entity.save();
 
-    let limitOrder = LimitOrder.load(event.params.id);
+    let limitOrder = LimitOrder.load(event.params.id.toHex());
     if (limitOrder) {
         const partiallyExecutedAmount = limitOrder.partiallyExecutedAmount;
         limitOrder.partiallyExecutedAmount = partiallyExecutedAmount === null
@@ -186,7 +205,7 @@ export function handleLimitOrderModified(event: LimitOrderModifiedEvent): void {
     entity.save();
 
     const orderId = event.params.id;
-    let limitOrder = LimitOrder.load(orderId);
+    let limitOrder = LimitOrder.load(orderId.toHex());
     if (limitOrder) {
         let limitOrderManagerContract = PoolLimitOrderManager.bind(event.address);
         let tryLimitOrderInfo = limitOrderManagerContract.try_limitOrders(orderId);

@@ -210,7 +210,9 @@ type LimitOrderExecutedPartially @entity(immutable: true) {
 }
 
 type LimitOrder @entity(immutable: false) {
-  id: Bytes!
+  id: ID!
+  orderId: Bytes!
+  index: Int!
   user: Bytes!
   pool: Bytes!
   takeProfitPrice: BigInt
