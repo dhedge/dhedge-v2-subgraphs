@@ -58,13 +58,16 @@ export function handleLimitOrderCreated(event: LimitOrderCreatedEvent): void {
   const orderId = event.params.id;
   let limitOrder = LimitOrder.load(orderId.toHex());
 
+  let newOrderIndex = 1;
+
   if (limitOrder) {
+    newOrderIndex = limitOrder.index + 1;
     archiveLimitOrder(limitOrder);
   }
 
   limitOrder = new LimitOrder(orderId.toHex());
   limitOrder.orderId = orderId;
-  limitOrder.index = 1;
+  limitOrder.index = newOrderIndex;
   limitOrder.user = event.params.user;
   limitOrder.pool = event.params.pool;
   limitOrder.partiallyExecutedAmount = BigInt.zero();
