@@ -42,6 +42,50 @@ dataSources:
         - event: FundCreated(address,bool,string,string,address,uint256,uint256,uint256,uint256)
           handler: handleFundCreated
       file: ./src/pool-factory-moonlight.ts
+  - kind: ethereum
+    name: PoolLimitOrderManager
+    network: matic
+    source:
+      address: "0xb71410736d2c8f2daf30da9d332da10534d2624d"
+      abi: PoolLimitOrderManager
+      startBlock: 71432340
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - AuthorizedKeeperAdded
+        - AuthorizedKeeperRemoved
+        - LimitOrderCreated
+        - LimitOrderModified
+        - SettlementOrderCreated
+        - LimitOrder
+        - LimitOrderExecuted
+        - LimitOrderDeleted
+        - LimitOrderExecutedPartially
+      abis:
+        - name: PoolLimitOrderManager
+          file: ./abis/PoolLimitOrderManager.json
+        - name: PoolFactoryMoonlight
+          file: ./abis/PoolFactoryMoonlight.json
+      eventHandlers:
+        - event: AuthorizedKeeperAdded(address)
+          handler: handleAuthorizedKeeperAdded
+        - event: AuthorizedKeeperRemoved(address)
+          handler: handleAuthorizedKeeperRemoved
+        - event: LimitOrderCreated(indexed address,indexed address,bytes32)
+          handler: handleLimitOrderCreated
+        - event: LimitOrderDeleted(indexed address,indexed address,bytes32)
+          handler: handleLimitOrderDeleted
+        - event: LimitOrderExecuted(indexed address,indexed address,bytes32)
+          handler: handleLimitOrderExecuted
+        - event: LimitOrderModified(indexed address,indexed address,bytes32)
+          handler: handleLimitOrderModified
+        - event: SettlementOrderCreated(indexed address)
+          handler: handleSettlementOrderCreated
+        - event: LimitOrderExecutedPartially(indexed address,indexed address,bytes32,uint256)
+          handler: handleLimitOrderExecutedPartially
+      file: ./src/pool-limit-order-manager.ts
 
 templates:
   - kind: ethereum/contract

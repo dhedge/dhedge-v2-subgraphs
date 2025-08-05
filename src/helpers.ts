@@ -4,17 +4,16 @@ import {
   BigInt,
   BigDecimal,
   ethereum,
+  store,
 } from '@graphprotocol/graph-ts';
 
 import { ERC20 } from '../generated/templates/PoolLogic/ERC20';
 import { PoolLogic } from '../generated/templates/PoolLogic/PoolLogic';
 import { PoolManagerLogic } from '../generated/templates/PoolLogic/PoolManagerLogic';
-import { Pool } from '../generated/schema';
+import {Investment, LimitOrder, Pool} from '../generated/schema';
 
 export let ZERO_BI = BigInt.fromI32(0);
 export let ONE_BI = BigInt.fromI32(1);
-export let ZERO_BD = BigDecimal.fromString('0');
-export let BI_18 = BigInt.fromI32(18);
 
 export function fetchTokenDecimals(tokenAddress: Address): BigInt {
   let contract = ERC20.bind(tokenAddress);
@@ -94,4 +93,91 @@ export function instantiatePool(
   }
 
   return pool as Pool;
+}
+
+export function instantiateInvestment(
+  id: string,
+  investorAddress: Address,
+  fundAddress: Address
+): Investment {
+  let investment = Investment.load(id);
+  if (!investment) {
+    investment = new Investment(id);
+    investment.investorAddress = investorAddress;
+    investment.fundAddress = fundAddress;
+    investment.investorBalance = BigInt.zero();
+  }
+  return investment;
+}
+
+export function instantiateLimitOrder(
+    id: string,
+    fundAddress: Address,
+    event: ethereum.Event
+): Pool {
+  let pool = Pool.load(id);
+  let poolContract = PoolLogic.bind(fundAddress);
+  let poolTokenDecimals = fetchTokenDecimals(fundAddress);
+
+  if (!pool) {
+    pool = new Pool(id);
+    pool.fundAddress = fundAddress;
+  }
+
+  let managerContract = PoolManagerLogic.bind(poolContract.poolManagerLogic());
+
+  let tryPoolName = poolContract.try_name();
+  if (tryPoolName.reverted) {
+    log.info('pool name was reverted in tx hash: {} at blockNumber: {}', [
+      event.transaction.hash.toHex(),
+      event.block.number.toString(),
+    ]);
+  } else {
+    pool.name = tryPoolName.value;
+  }
+
+  pool.manager = managerContract.manager();
+  pool.managerName = managerContract.managerName();
+  pool.decimals = poolTokenDecimals;
+
+  let poolSupply = convertTokenToDecimal(
+      poolContract.totalSupply(),
+      poolTokenDecimals
+  );
+  pool.totalSupply = poolSupply;
+
+  let tryPoolTokenPrice = poolContract.try_tokenPrice();
+  if (tryPoolTokenPrice.reverted) {
+    log.info(
+        'pool token price was reverted in tx hash: {} at blockNumber: {}',
+        [event.transaction.hash.toHex(), event.block.number.toString()]
+    );
+  } else {
+    pool.tokenPrice = tryPoolTokenPrice.value;
+  }
+
+  return pool as Pool;
+}
+
+export function archiveLimitOrder(limitOrder: LimitOrder): void {
+  const limitOrderToArchive = new LimitOrder(limitOrder.id + "-" + limitOrder.index.toString());
+
+  limitOrderToArchive.orderId = limitOrder.orderId;
+  limitOrderToArchive.index = limitOrder.index;
+  limitOrderToArchive.user = limitOrder.user;
+  limitOrderToArchive.pool = limitOrder.pool;
+  limitOrderToArchive.partiallyExecutedAmount = limitOrder.partiallyExecutedAmount;
+  limitOrderToArchive.blockNumberCreated = limitOrder.blockNumberCreated;
+  limitOrderToArchive.timeCreated = limitOrder.timeCreated;
+  limitOrderToArchive.blockNumberUpdated = limitOrder.blockNumberUpdated;
+  limitOrderToArchive.timeUpdated = limitOrder.timeUpdated;
+  limitOrderToArchive.status = limitOrder.status;
+  limitOrderToArchive.takeProfitPrice = limitOrder.takeProfitPrice;
+  limitOrderToArchive.stopLossPrice = limitOrder.stopLossPrice;
+  limitOrderToArchive.closePrice = limitOrder.closePrice;
+  limitOrderToArchive.pricingAsset = limitOrder.pricingAsset;
+  limitOrderToArchive.amount = limitOrder.amount;
+
+  store.remove("LimitOrder", limitOrder.id);
+  limitOrderToArchive.save();
 }
