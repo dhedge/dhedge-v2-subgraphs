@@ -1,4 +1,5 @@
 import { dataSource, Address } from '@graphprotocol/graph-ts';
+import {Network} from "./helpers";
 
 const DAO_ADDRESS_POLYGON = Address.fromString('0x6f005cbceC52FFb28aF046Fd48CB8D6d19FD25E3');
 const DAO_ADDRESS_OPTIMISM = Address.fromString('0xD857e322351Dc56592e3D9181FBF65034EF4aef2');
@@ -9,15 +10,15 @@ const DAO_ADDRESS_MAINNET = Address.fromString('0xfF44B48abad9cb7A2485f829E5c9A4
 export function getDaoAddress(): Address {
     let network = dataSource.network();
 
-    if (network == 'polygon') {
+    if (network == Network.POLYGON) {
         return DAO_ADDRESS_POLYGON;
-    } else if (network == 'optimism') {
+    } else if (network == Network.OPTIMISM) {
         return DAO_ADDRESS_OPTIMISM;
-    } else if (network == 'base') {
+    } else if (network == Network.BASE) {
         return DAO_ADDRESS_BASE;
-    } else if (network == 'arbitrum') {
+    } else if (network == Network.ARBITRUM) {
         return DAO_ADDRESS_ARBITRUM;
-    } else if (network == 'mainnet') {
+    } else if (network == Network.MAINNET) {
         return DAO_ADDRESS_MAINNET;
     } else {
         throw new Error(`Missing dao address for the network ${network}`);
@@ -33,15 +34,15 @@ const POOL_FACTORY_ADDRESS_MAINNET = Address.fromString('0x96D33bCF84DdE32601424
 export function getPoolFactoryAddress(): Address {
     let network = dataSource.network();
 
-    if (network == 'polygon') {
+    if (network == Network.POLYGON) {
         return POOL_FACTORY_ADDRESS_POLYGON;
-    } else if (network == 'optimism') {
+    } else if (network == Network.OPTIMISM) {
         return POOL_FACTORY_ADDRESS_OPTIMISM;
-    } else if (network == 'base') {
+    } else if (network == Network.BASE) {
         return POOL_FACTORY_ADDRESS_BASE;
-    } else if (network == 'arbitrum') {
+    } else if (network == Network.ARBITRUM) {
         return POOL_FACTORY_ADDRESS_ARBITRUM;
-    } else if (network == 'mainnet') {
+    } else if (network == Network.MAINNET) {
         return POOL_FACTORY_ADDRESS_MAINNET;
     } else {
         throw new Error(`Missing pool factory address for the network ${network}`);

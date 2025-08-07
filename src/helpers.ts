@@ -15,6 +15,14 @@ import {Investment, LimitOrder, Pool} from '../generated/schema';
 export let ZERO_BI = BigInt.fromI32(0);
 export let ONE_BI = BigInt.fromI32(1);
 
+export namespace Network {
+  export const POLYGON = 'matic';
+  export const OPTIMISM = 'optimism';
+  export const BASE = 'base';
+  export const ARBITRUM = 'arbitrum-one';
+  export const MAINNET = 'mainnet';
+}
+
 export function fetchTokenDecimals(tokenAddress: Address): BigInt {
   let contract = ERC20.bind(tokenAddress);
 
