@@ -48,5 +48,3 @@ export function getPoolFactoryAddress(): Address {
         throw new Error(`Missing pool factory address for the network ${network}`);
     }
 }
-
-export const POOL_FACTORY_ADDRESS = '0xfdc7b8bFe0DD3513Cc669bB8d601Cb83e2F69cB0';
