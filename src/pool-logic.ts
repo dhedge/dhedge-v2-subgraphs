@@ -22,6 +22,7 @@ import {
   Investment,
 } from '../generated/schema';
 import { log } from "@graphprotocol/graph-ts/index";
+import { getDaoAddress } from "./addresses";
 
 export function handleDeposit(event: DepositEvent): void {
   let entity = new Deposit(
@@ -253,51 +254,105 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
 }
 
 export function handleEntryFeeMinted(event: EntryFeeMintedEvent): void {
-  let entity = new EntryFeeMinted(
-      event.transaction.hash.toHex() + '-' + event.logIndex.toString()
-  );
-
-  entity.pool = event.address;
-  entity.managerAddress = event.params.manager;
-  entity.entryFeeAmount = event.params.entryFeeAmount;
-  entity.time = event.block.timestamp;
-  entity.blockNumber = event.block.number.toI32();
-
-  let poolContract = PoolLogic.bind(event.address);
-  let tryPoolTokenPrice = poolContract.try_tokenPrice();
-  if (tryPoolTokenPrice.reverted) {
-    log.info(
-        'pool token price was reverted in tx hash: {} at blockNumber: {}',
-        [event.transaction.hash.toHex(), event.block.number.toString()]
+  if (getDaoAddress().equals(event.params.manager)) {
+    let entity = new ManagerFeeMinted(
+        event.transaction.hash.toHex() + '-' + event.logIndex.toString()
     );
-  } else {
-    entity.tokenPrice = tryPoolTokenPrice.value;
-  }
+    entity.pool = event.address;
+    entity.manager = event.params.manager;
+    entity.available = BigInt.zero();
+    entity.daoFee = event.params.entryFeeAmount;
+    entity.managerFee = BigInt.zero();
+    entity.tokenPriceAtLastFeeMint = BigInt.zero();
+    entity.block = event.block.number.toI32();
+    entity.blockTimestamp = event.block.timestamp;
 
-  entity.save();
+    let poolContract = PoolLogic.bind(event.address);
+    let tryPoolTokenPrice = poolContract.try_tokenPrice();
+    if (tryPoolTokenPrice.reverted) {
+      log.info(
+          'pool token price was reverted in tx hash: {} at blockNumber: {}',
+          [event.transaction.hash.toHex(), event.block.number.toString()]
+      );
+    } else {
+      entity.tokenPriceAtFeeMint = tryPoolTokenPrice.value;
+    }
+
+    entity.save();
+  } else {
+    let entity = new EntryFeeMinted(
+        event.transaction.hash.toHex() + '-' + event.logIndex.toString()
+    );
+
+    entity.pool = event.address;
+    entity.managerAddress = event.params.manager;
+    entity.entryFeeAmount = event.params.entryFeeAmount;
+    entity.time = event.block.timestamp;
+    entity.blockNumber = event.block.number.toI32();
+
+    let poolContract = PoolLogic.bind(event.address);
+    let tryPoolTokenPrice = poolContract.try_tokenPrice();
+    if (tryPoolTokenPrice.reverted) {
+      log.info(
+          'pool token price was reverted in tx hash: {} at blockNumber: {}',
+          [event.transaction.hash.toHex(), event.block.number.toString()]
+      );
+    } else {
+      entity.tokenPrice = tryPoolTokenPrice.value;
+    }
+
+    entity.save();
+  }
 }
 
 export function handleExitFeeMinted(event: ExitFeeMintedEvent): void {
-  let entity = new ExitFeeMinted(
-      event.transaction.hash.toHex() + '-' + event.logIndex.toString()
-  );
-
-  entity.pool = event.address;
-  entity.managerAddress = event.params.manager;
-  entity.exitFeeAmount = event.params.exitFeeAmount;
-  entity.time = event.block.timestamp;
-  entity.blockNumber = event.block.number.toI32();
-
-  let poolContract = PoolLogic.bind(event.address);
-  let tryPoolTokenPrice = poolContract.try_tokenPrice();
-  if (tryPoolTokenPrice.reverted) {
-    log.info(
-        'pool token price was reverted in tx hash: {} at blockNumber: {}',
-        [event.transaction.hash.toHex(), event.block.number.toString()]
+  if (getDaoAddress().equals(event.params.manager)) {
+    let entity = new ManagerFeeMinted(
+        event.transaction.hash.toHex() + '-' + event.logIndex.toString()
     );
-  } else {
-    entity.tokenPrice = tryPoolTokenPrice.value;
-  }
+    entity.pool = event.address;
+    entity.manager = event.params.manager;
+    entity.available = BigInt.zero();
+    entity.daoFee = event.params.exitFeeAmount;
+    entity.managerFee = BigInt.zero();
+    entity.tokenPriceAtLastFeeMint = BigInt.zero();
+    entity.block = event.block.number.toI32();
+    entity.blockTimestamp = event.block.timestamp;
 
-  entity.save();
+    let poolContract = PoolLogic.bind(event.address);
+    let tryPoolTokenPrice = poolContract.try_tokenPrice();
+    if (tryPoolTokenPrice.reverted) {
+      log.info(
+          'pool token price was reverted in tx hash: {} at blockNumber: {}',
+          [event.transaction.hash.toHex(), event.block.number.toString()]
+      );
+    } else {
+      entity.tokenPriceAtFeeMint = tryPoolTokenPrice.value;
+    }
+
+    entity.save();
+  } else {
+    let entity = new ExitFeeMinted(
+        event.transaction.hash.toHex() + '-' + event.logIndex.toString()
+    );
+
+    entity.pool = event.address;
+    entity.managerAddress = event.params.manager;
+    entity.exitFeeAmount = event.params.exitFeeAmount;
+    entity.time = event.block.timestamp;
+    entity.blockNumber = event.block.number.toI32();
+
+    let poolContract = PoolLogic.bind(event.address);
+    let tryPoolTokenPrice = poolContract.try_tokenPrice();
+    if (tryPoolTokenPrice.reverted) {
+      log.info(
+          'pool token price was reverted in tx hash: {} at blockNumber: {}',
+          [event.transaction.hash.toHex(), event.block.number.toString()]
+      );
+    } else {
+      entity.tokenPrice = tryPoolTokenPrice.value;
+    }
+
+    entity.save();
+  }
 }
