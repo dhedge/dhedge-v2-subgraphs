@@ -9,7 +9,7 @@ import {
   Withdrawal as WithdrawalEvent,
   PoolLogic,
 } from '../generated/templates/PoolLogic/PoolLogic';
-import { instantiateInvestment, instantiatePool } from './helpers';
+import { instantiateInvestment, instantiatePool, ZERO_ADDRESS } from './helpers';
 import {
   Deposit,
   ManagerFeeMinted,
@@ -259,7 +259,7 @@ export function handleEntryFeeMinted(event: EntryFeeMintedEvent): void {
         event.transaction.hash.toHex() + '-' + event.logIndex.toString()
     );
     entity.pool = event.address;
-    entity.manager = event.params.manager;
+    entity.manager = ZERO_ADDRESS;
     entity.available = BigInt.zero();
     entity.daoFee = event.params.entryFeeAmount;
     entity.managerFee = BigInt.zero();
@@ -311,7 +311,7 @@ export function handleExitFeeMinted(event: ExitFeeMintedEvent): void {
         event.transaction.hash.toHex() + '-' + event.logIndex.toString()
     );
     entity.pool = event.address;
-    entity.manager = event.params.manager;
+    entity.manager = ZERO_ADDRESS;
     entity.available = BigInt.zero();
     entity.daoFee = event.params.exitFeeAmount;
     entity.managerFee = BigInt.zero();

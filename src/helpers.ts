@@ -10,10 +10,11 @@ import {
 import { ERC20 } from '../generated/templates/PoolLogic/ERC20';
 import { PoolLogic } from '../generated/templates/PoolLogic/PoolLogic';
 import { PoolManagerLogic } from '../generated/templates/PoolLogic/PoolManagerLogic';
-import {Investment, LimitOrder, Pool} from '../generated/schema';
+import { Investment, LimitOrder, Pool } from '../generated/schema';
 
-export let ZERO_BI = BigInt.fromI32(0);
-export let ONE_BI = BigInt.fromI32(1);
+export const ZERO_BI = BigInt.fromI32(0);
+export const ONE_BI = BigInt.fromI32(1);
+export const ZERO_ADDRESS = Address.fromString("0x0000000000000000000000000000000000000000");
 
 export namespace Network {
   export const POLYGON = 'matic';
