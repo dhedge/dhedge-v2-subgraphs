@@ -254,7 +254,7 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
 }
 
 export function handleEntryFeeMinted(event: EntryFeeMintedEvent): void {
-  if (getDaoAddress().equals(event.params.manager)) {
+  if (getDaoAddress().equals(event.params.recipient)) {
     let entity = new ManagerFeeMinted(
         event.transaction.hash.toHex() + '-' + event.logIndex.toString()
     );
@@ -285,7 +285,7 @@ export function handleEntryFeeMinted(event: EntryFeeMintedEvent): void {
     );
 
     entity.pool = event.address;
-    entity.managerAddress = event.params.manager;
+    entity.managerAddress = event.params.recipient;
     entity.entryFeeAmount = event.params.entryFeeAmount;
     entity.time = event.block.timestamp;
     entity.blockNumber = event.block.number.toI32();
@@ -306,7 +306,7 @@ export function handleEntryFeeMinted(event: EntryFeeMintedEvent): void {
 }
 
 export function handleExitFeeMinted(event: ExitFeeMintedEvent): void {
-  if (getDaoAddress().equals(event.params.manager)) {
+  if (getDaoAddress().equals(event.params.recipient)) {
     let entity = new ManagerFeeMinted(
         event.transaction.hash.toHex() + '-' + event.logIndex.toString()
     );
@@ -337,7 +337,7 @@ export function handleExitFeeMinted(event: ExitFeeMintedEvent): void {
     );
 
     entity.pool = event.address;
-    entity.managerAddress = event.params.manager;
+    entity.managerAddress = event.params.recipient;
     entity.exitFeeAmount = event.params.exitFeeAmount;
     entity.time = event.block.timestamp;
     entity.blockNumber = event.block.number.toI32();
