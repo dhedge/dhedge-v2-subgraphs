@@ -97,7 +97,7 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "manager",
+        "name": "recipient",
         "type": "address"
       },
       {
@@ -116,7 +116,7 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "manager",
+        "name": "recipient",
         "type": "address"
       },
       {
