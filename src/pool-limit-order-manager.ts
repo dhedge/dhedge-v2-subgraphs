@@ -20,7 +20,7 @@ import {
   SettlementOrderCreated
 } from '../generated/schema';
 import { PoolFactoryMoonlight } from '../generated/PoolFactoryMoonlight/PoolFactoryMoonlight';
-import { POOL_FACTORY_ADDRESS } from './addresses';
+import { getPoolFactoryAddress } from './addresses';
 import { archiveLimitOrder } from './helpers';
 
 export function handleAuthorizedKeeperAdded(event: AuthorizedKeeperAddedEvent): void {
@@ -135,7 +135,7 @@ export function handleLimitOrderExecuted(event: LimitOrderExecutedEvent): void {
     limitOrder.timeUpdated = event.block.timestamp;
     limitOrder.status = 1;
 
-    let poolFactoryContract = PoolFactoryMoonlight.bind(Address.fromString(POOL_FACTORY_ADDRESS));
+    let poolFactoryContract = PoolFactoryMoonlight.bind(getPoolFactoryAddress());
 
     const pricingAsset = limitOrder.pricingAsset;
 
