@@ -1,5 +1,5 @@
 import { dataSource, Address } from '@graphprotocol/graph-ts';
-import {Network} from "./helpers";
+import { Network } from "./helpers";
 
 const DAO_ADDRESS_POLYGON = Address.fromString('0x6f005cbceC52FFb28aF046Fd48CB8D6d19FD25E3');
 const DAO_ADDRESS_OPTIMISM = Address.fromString('0xD857e322351Dc56592e3D9181FBF65034EF4aef2');

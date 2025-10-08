@@ -93,6 +93,10 @@ templates:
           file: ./abis/PoolManagerLogic.json
         - name: ERC20
           file: ./abis/ERC20.json
+        - name: EasySwapperV2
+          file: ./abis/EasySwapperV2.json
+        - name: WithdrawalVault
+          file: ./abis/WithdrawalVault.json
       eventHandlers:
         - event: Deposit(address,address,address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
           handler: handleDeposit

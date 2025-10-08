@@ -16,6 +16,8 @@ export const ZERO_BI = BigInt.fromI32(0);
 export const ONE_BI = BigInt.fromI32(1);
 export const ZERO_ADDRESS = Address.fromString("0x0000000000000000000000000000000000000000");
 
+export const BLOCK_TIME_EASYSWAPPER_V2_USED_FROM = BigInt.fromI32(1754640035);
+
 export namespace Network {
   export const POLYGON = 'matic';
   export const OPTIMISM = 'optimism';
