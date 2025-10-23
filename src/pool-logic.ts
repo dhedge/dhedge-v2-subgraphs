@@ -1,4 +1,4 @@
-import { dataSource, BigInt } from '@graphprotocol/graph-ts';
+import {dataSource, BigInt, Address} from '@graphprotocol/graph-ts';
 import {
   Deposit as DepositEvent,
   EntryFeeMinted as EntryFeeMintedEvent,
@@ -9,7 +9,7 @@ import {
   Withdrawal as WithdrawalEvent,
   PoolLogic,
 } from '../generated/templates/PoolLogic/PoolLogic';
-import { instantiateInvestment, instantiatePool, ZERO_ADDRESS } from './helpers';
+import {BLOCK_TIME_EASYSWAPPER_V2_USED_FROM, instantiateInvestment, instantiatePool, ZERO_ADDRESS} from './helpers';
 import {
   Deposit,
   ManagerFeeMinted,
@@ -22,7 +22,9 @@ import {
   Investment,
 } from '../generated/schema';
 import { log } from "@graphprotocol/graph-ts/index";
-import { getDaoAddress } from "./addresses";
+import {getDaoAddress, getEasySwapperV2Address} from "./addresses";
+import { WithdrawalVault } from "../generated/templates/PoolLogic/WithdrawalVault";
+import { EasySwapperV2 } from "../generated/templates/PoolLogic/EasySwapperV2";
 
 export function handleDeposit(event: DepositEvent): void {
   let entity = new Deposit(
@@ -182,13 +184,69 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
   let entity = new Withdrawal(
     event.transaction.hash.toHex() + '-' + event.logIndex.toString()
   );
-  let id = dataSource.address().toHexString();
-  let pool = instantiatePool(id, event.params.fundAddress, event);
+  let poolId = dataSource.address().toHexString();
+  let pool = instantiatePool(poolId, event.params.fundAddress, event);
   pool.save();
 
-  // use this address instead of event.params.investor to avoid incorrect address mapping
-  // when using 3rd party contracts like EasySwapper
-  let investorAddress =  event.transaction.from;
+  let poolContract = PoolLogic.bind(event.params.fundAddress);
+
+  let investorAddress: Address;
+  if (event.params.time.lt(BLOCK_TIME_EASYSWAPPER_V2_USED_FROM)) {
+    // use this address instead of event.params.investor to avoid incorrect address mapping
+    // when using 3rd party contracts like EasySwapper
+    investorAddress =  event.transaction.from;
+
+    if (event.transaction.from !== event.params.investor) {
+      const potentialInvestorAddress = event.params.investor;
+      let tryPotentialInvestorBalanceOf = poolContract.try_balanceOf(potentialInvestorAddress);
+      if (tryPotentialInvestorBalanceOf.reverted) {
+        log.info(
+        'investor pool balance was reverted in tx hash: {} at blockNumber: {}',
+          [event.transaction.hash.toHex(), event.block.number.toString()]
+        );
+      } else {
+        let investmentId = potentialInvestorAddress.toHexString() + event.params.fundAddress.toHexString();
+        let investment = Investment.load(investmentId);
+        if (investment) {
+          if (!investment.investorBalance.equals(BigInt.zero()) && tryPotentialInvestorBalanceOf.value.equals(BigInt.zero())) {
+            investment.positionOpenTimestamp = null;
+          }
+          investment.investorBalance = tryPotentialInvestorBalanceOf.value;
+          investment.save();
+        }
+      }
+    }
+  } else {
+    investorAddress = event.params.investor;
+
+    let isWithdrawalVault = false;
+
+    const withdrawalVaultContract = WithdrawalVault.bind(investorAddress);
+    let tryDepositor = withdrawalVaultContract.try_depositor();
+    if (tryDepositor.reverted) {
+      log.info(
+       'tryDepositor for withdrawalVaultContract was reverted in tx hash: {} at blockNumber: {}',
+        [event.transaction.hash.toHex(), event.block.number.toString()]
+      );
+    } else if (tryDepositor.value && !tryDepositor.value.equals(ZERO_ADDRESS)) {
+      investorAddress = tryDepositor.value;
+      isWithdrawalVault = true;
+    }
+
+    if (!isWithdrawalVault) {
+      const limitOrderVaultContract = WithdrawalVault.bind(investorAddress);
+      tryDepositor = limitOrderVaultContract.try_depositor();
+      if (tryDepositor.reverted) {
+        log.info(
+         'tryDepositor for limitOrderVaultContract was reverted in tx hash: {} at blockNumber: {}',
+          [event.transaction.hash.toHex(), event.block.number.toString()]
+        );
+      } else if (tryDepositor.value && !tryDepositor.value.equals(ZERO_ADDRESS)) {
+        investorAddress = tryDepositor.value;
+      }
+    }
+  }
+
   let investor = Investor.load(investorAddress.toHexString());
   if (!investor) {
     investor = new Investor(investorAddress.toHexString());
@@ -209,7 +267,6 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
   entity.time = event.params.time;
   entity.block = event.block.number.toI32();
 
-  let poolContract = PoolLogic.bind(event.params.fundAddress);
   let tryBalanceOf = poolContract.try_balanceOf(investorAddress);
   if (tryBalanceOf.reverted) {
     log.info(
@@ -226,27 +283,6 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
       }
       investment.investorBalance = tryBalanceOf.value;
       investment.save();
-    }
-  }
-
-  if (event.transaction.from !== event.params.investor) {
-    const potentialInvestorAddress = event.params.investor;
-    let tryPotentialInvestorBalanceOf = poolContract.try_balanceOf(potentialInvestorAddress);
-    if (tryPotentialInvestorBalanceOf.reverted) {
-      log.info(
-          'investor pool balance was reverted in tx hash: {} at blockNumber: {}',
-          [event.transaction.hash.toHex(), event.block.number.toString()]
-      );
-    } else {
-      let investmentId = potentialInvestorAddress.toHexString() + event.params.fundAddress.toHexString();
-      let investment = Investment.load(investmentId);
-      if (investment) {
-        if (!investment.investorBalance.equals(BigInt.zero()) && tryPotentialInvestorBalanceOf.value.equals(BigInt.zero())) {
-          investment.positionOpenTimestamp = null;
-        }
-        investment.investorBalance = tryPotentialInvestorBalanceOf.value;
-        investment.save();
-      }
     }
   }
 
