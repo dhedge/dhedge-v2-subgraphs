@@ -9,7 +9,7 @@ import {
   Withdrawal as WithdrawalEvent,
   PoolLogic,
 } from '../generated/templates/PoolLogic/PoolLogic';
-import {BLOCK_TIME_EASYSWAPPER_V2_USED_FROM, instantiateInvestment, instantiatePool, ZERO_ADDRESS} from './helpers';
+import { BLOCK_TIME_EASYSWAPPER_V2_USED_FROM, instantiateInvestment, instantiatePool, ZERO_ADDRESS } from './helpers';
 import {
   Deposit,
   ManagerFeeMinted,
@@ -22,9 +22,8 @@ import {
   Investment,
 } from '../generated/schema';
 import { log } from "@graphprotocol/graph-ts/index";
-import {getDaoAddress, getEasySwapperV2Address} from "./addresses";
+import { getDaoAddress } from "./addresses";
 import { WithdrawalVault } from "../generated/templates/PoolLogic/WithdrawalVault";
-import { EasySwapperV2 } from "../generated/templates/PoolLogic/EasySwapperV2";
 
 export function handleDeposit(event: DepositEvent): void {
   let entity = new Deposit(

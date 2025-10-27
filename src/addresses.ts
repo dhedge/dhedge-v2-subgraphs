@@ -48,27 +48,3 @@ export function getPoolFactoryAddress(): Address {
         throw new Error(`Missing pool factory address for the network ${network}`);
     }
 }
-
-const EASY_SWAPPER_V2_POLYGON = Address.fromString('0x45b90480d6f643de2f128db091a357c3c90399f2')
-const EASY_SWAPPER_V2_OPTIMISM = Address.fromString('0x2ed1bd7f66e47113672f3870308b5e867c5bb743')
-const EASY_SWAPPER_V2_BASE = Address.fromString('0xf067575eb60c7587c11e867907aa7284833704d1')
-const EASY_SWAPPER_V2_ARBITRUM = Address.fromString('0xa5679c4272a056bb83f039961fae7d99c48529f5')
-const EASY_SWAPPER_V2_MAINNET = Address.fromString('0xbdd84294bc8299861a2121f749a25efeb7168a32')
-
-export function getEasySwapperV2Address(): Address {
-    let network = dataSource.network()
-
-    if (network == Network.POLYGON) {
-        return EASY_SWAPPER_V2_POLYGON
-    } else if (network == Network.OPTIMISM) {
-        return EASY_SWAPPER_V2_OPTIMISM
-    } else if (network == Network.BASE) {
-        return EASY_SWAPPER_V2_BASE
-    } else if (network == Network.ARBITRUM) {
-        return EASY_SWAPPER_V2_ARBITRUM
-    } else if (network == Network.MAINNET) {
-        return EASY_SWAPPER_V2_MAINNET
-    } else {
-        throw new Error(`Missing easy swapper v2 address for network ${network}`)
-    }
-}
