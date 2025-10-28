@@ -129,3 +129,21 @@ templates:
         - event: ExitFeeMinted(address,uint256)
           handler: handleExitFeeMinted
       file: ./src/pool-logic.ts
+  - kind: ethereum/contract
+    name: PoolManagerLogic
+    network: arbitrum-one
+    source:
+      abi: PoolManagerLogic
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - ManagerUpdated
+      abis:
+        - name: PoolManagerLogic
+          file: ./abis/PoolManagerLogic.json
+      eventHandlers:
+        - event: ManagerUpdated(address,string)
+          handler: handleManagerUpdated
+      file: ./src/pool-manager-logic.ts
