@@ -218,8 +218,6 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
   } else {
     investorAddress = event.params.investor;
 
-    let isWithdrawalVault = false;
-
     const withdrawalVaultContract = WithdrawalVault.bind(investorAddress);
     let tryDepositor = withdrawalVaultContract.try_depositor();
     if (tryDepositor.reverted) {
@@ -229,20 +227,6 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
       );
     } else if (tryDepositor.value && !tryDepositor.value.equals(ZERO_ADDRESS)) {
       investorAddress = tryDepositor.value;
-      isWithdrawalVault = true;
-    }
-
-    if (!isWithdrawalVault) {
-      const limitOrderVaultContract = WithdrawalVault.bind(investorAddress);
-      tryDepositor = limitOrderVaultContract.try_depositor();
-      if (tryDepositor.reverted) {
-        log.info(
-         'tryDepositor for limitOrderVaultContract was reverted in tx hash: {} at blockNumber: {}',
-          [event.transaction.hash.toHex(), event.block.number.toString()]
-        );
-      } else if (tryDepositor.value && !tryDepositor.value.equals(ZERO_ADDRESS)) {
-        investorAddress = tryDepositor.value;
-      }
     }
   }
 
