@@ -9,7 +9,12 @@ import {
   Withdrawal as WithdrawalEvent,
   PoolLogic,
 } from '../generated/templates/PoolLogic/PoolLogic';
-import { BLOCK_TIME_EASYSWAPPER_V2_USED_FROM, instantiateInvestment, instantiatePool, ZERO_ADDRESS } from './helpers';
+import {
+  getWithdrawalInvestorFieldFixBlock,
+  instantiateInvestment,
+  instantiatePool,
+  ZERO_ADDRESS
+} from './helpers';
 import {
   Deposit,
   ManagerFeeMinted,
@@ -190,29 +195,23 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
   let poolContract = PoolLogic.bind(event.params.fundAddress);
 
   let investorAddress: Address;
-  if (event.params.time.lt(BLOCK_TIME_EASYSWAPPER_V2_USED_FROM)) {
+  if (event.params.time.lt(getWithdrawalInvestorFieldFixBlock())) {
     // use this address instead of event.params.investor to avoid incorrect address mapping
     // when using 3rd party contracts like EasySwapper
     investorAddress =  event.transaction.from;
 
     if (event.transaction.from !== event.params.investor) {
       const potentialInvestorAddress = event.params.investor;
-      let tryPotentialInvestorBalanceOf = poolContract.try_balanceOf(potentialInvestorAddress);
-      if (tryPotentialInvestorBalanceOf.reverted) {
-        log.info(
-        'investor pool balance was reverted in tx hash: {} at blockNumber: {}',
-          [event.transaction.hash.toHex(), event.block.number.toString()]
-        );
-      } else {
-        let investmentId = potentialInvestorAddress.toHexString() + event.params.fundAddress.toHexString();
-        let investment = Investment.load(investmentId);
-        if (investment) {
-          if (!investment.investorBalance.equals(BigInt.zero()) && tryPotentialInvestorBalanceOf.value.equals(BigInt.zero())) {
-            investment.positionOpenTimestamp = null;
-          }
-          investment.investorBalance = tryPotentialInvestorBalanceOf.value;
-          investment.save();
+      const potentialInvestorBalance = poolContract.balanceOf(potentialInvestorAddress);
+      let investmentId = potentialInvestorAddress.toHexString() + event.params.fundAddress.toHexString();
+      let investment = Investment.load(investmentId);
+      if (investment) {
+        if (!investment.investorBalance.equals(BigInt.zero()) && potentialInvestorBalance.equals(BigInt.zero())) {
+          investment.positionOpenTimestamp = null;
         }
+
+        investment.investorBalance = potentialInvestorBalance;
+        investment.save();
       }
     }
   } else {
