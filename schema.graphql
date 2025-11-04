@@ -87,24 +87,24 @@ type Pool @entity(immutable: false) {
   id: ID!
   fundAddress: Bytes!
   name: String!
-  manager: Bytes # optional
+  manager: Bytes
   managerName: String!
   totalSupply: BigDecimal!
-  tokenPrice: BigInt # optional
-  decimals: BigInt # optional
+  tokenPrice: BigInt
+  decimals: BigInt
   deposits: [Deposit!]! @derivedFrom(field: "pool")
   withdrawals: [Withdrawal!]! @derivedFrom(field: "pool")
 }
 
 type Manager @entity(immutable: false) {
   id: ID!
-  managerAddress: Bytes! # address
+  managerAddress: Bytes!
   fundCreated: [FundCreated!]! @derivedFrom(field: "uniqueManager")
 }
 
 type Investor @entity(immutable: false) {
   id: ID!
-  investorAddress: Bytes! # address
+  investorAddress: Bytes!
   deposits: [Deposit!]! @derivedFrom(field: "uniqueInvestor")
   withdrawals: [Withdrawal!]! @derivedFrom(field: "uniqueInvestor")
 }
@@ -112,7 +112,7 @@ type Investor @entity(immutable: false) {
 type EntryFeeMinted @entity(immutable: true) {
   id: ID!
   pool: Bytes!
-  managerAddress: Bytes! # address
+  managerAddress: Bytes!
   entryFeeAmount: BigInt!
   tokenPrice: BigInt
   blockNumber: Int!
@@ -122,9 +122,108 @@ type EntryFeeMinted @entity(immutable: true) {
 type ExitFeeMinted @entity(immutable: true) {
   id: ID!
   pool: Bytes!
-  managerAddress: Bytes! # address
+  managerAddress: Bytes!
   exitFeeAmount: BigInt!
   tokenPrice: BigInt
   blockNumber: Int!
   time: BigInt!
+}
+
+type Investment @entity(immutable: false) {
+  id: ID!
+  investorAddress: Bytes!
+  fundAddress: Bytes!
+  investorBalance: BigInt!
+  positionOpenTimestamp: BigInt
+}
+
+type AuthorizedKeeperAdded @entity(immutable: true) {
+  id: ID!
+  keeper: Bytes!
+  blockNumber: Int!
+  time: BigInt!
+}
+
+type AuthorizedKeeperRemoved @entity(immutable: true) {
+  id: ID!
+  keeper: Bytes!
+  blockNumber: Int!
+  time: BigInt!
+}
+
+type LimitOrderCreated @entity(immutable: true) {
+  id: ID!
+  user: Bytes!
+  pool: Bytes!
+  orderId: Bytes! # uint256
+  transactionHash: Bytes!
+  blockNumber: Int!
+  time: BigInt!
+}
+
+type LimitOrderModified @entity(immutable: true) {
+  id: ID!
+  user: Bytes!
+  pool: Bytes!
+  orderId: Bytes!
+  transactionHash: Bytes!
+  blockNumber: Int!
+  time: BigInt!
+}
+
+type LimitOrderExecuted @entity(immutable: true) {
+  id: ID!
+  user: Bytes!
+  pool: Bytes!
+  orderId: Bytes!
+  transactionHash: Bytes!
+  blockNumber: Int!
+  time: BigInt!
+}
+
+type LimitOrderDeleted @entity(immutable: true) {
+  id: ID!
+  user: Bytes!
+  pool: Bytes!
+  orderId: Bytes!
+  transactionHash: Bytes!
+  blockNumber: Int!
+  time: BigInt!
+}
+
+type SettlementOrderCreated @entity(immutable: true) {
+  id: ID!
+  user: Bytes!
+  blockNumber: Int!
+  time: BigInt!
+}
+
+type LimitOrderExecutedPartially @entity(immutable: true) {
+  id: ID!
+  user: Bytes!
+  pool: Bytes!
+  orderId: Bytes!
+  amount: BigInt!
+  transactionHash: Bytes!
+  blockNumber: Int!
+  time: BigInt!
+}
+
+type LimitOrder @entity(immutable: false) {
+  id: ID!
+  orderId: Bytes!
+  index: Int!
+  user: Bytes!
+  pool: Bytes!
+  takeProfitPrice: BigInt
+  stopLossPrice: BigInt
+  closePrice: BigInt
+  amount: BigInt
+  partiallyExecutedAmount: BigInt
+  pricingAsset: Bytes
+  status: Int!
+  blockNumberCreated: Int!
+  blockNumberUpdated: Int!
+  timeCreated: BigInt!
+  timeUpdated: BigInt!
 }
