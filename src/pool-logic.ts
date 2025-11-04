@@ -10,8 +10,10 @@ import {
   PoolLogic,
 } from '../generated/templates/PoolLogic/PoolLogic';
 import {
-    BLOCK_TIME_EASYSWAPPER_V2_USED_FROM,
-    getWithdrawalInvestorFieldFixBlock, instantiateInvestment, instantiatePool, ZERO_ADDRESS
+  getWithdrawalInvestorFieldFixBlock,
+  instantiateInvestment,
+  instantiatePool,
+  ZERO_ADDRESS
 } from './helpers';
 import {
   Deposit,
