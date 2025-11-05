@@ -5,6 +5,7 @@ import {
   BigDecimal,
   ethereum,
   store,
+  dataSource,
 } from '@graphprotocol/graph-ts';
 
 import { ERC20 } from '../generated/templates/PoolLogic/ERC20';
@@ -15,6 +16,28 @@ import { Investment, LimitOrder, Pool } from '../generated/schema';
 export const ZERO_BI = BigInt.fromI32(0);
 export const ONE_BI = BigInt.fromI32(1);
 export const ZERO_ADDRESS = Address.fromString("0x0000000000000000000000000000000000000000");
+
+const WITHDRAWAL_INVESTOR_FIELD_FIX_BLOCK_POLYGON = BigInt.fromString("73190124");
+const WITHDRAWAL_INVESTOR_FIELD_FIX_BLOCK_OPTIMISM = BigInt.fromString("138480531");
+const WITHDRAWAL_INVESTOR_FIELD_FIX_BLOCK_ARBITRUM = BigInt.fromString("355435959");
+const WITHDRAWAL_INVESTOR_FIELD_FIX_BLOCK_BASE = BigInt.fromString("32322706");
+const WITHDRAWAL_INVESTOR_FIELD_FIX_BLOCK_MAINNET = BigInt.fromString("22581863");
+
+export function getWithdrawalInvestorFieldFixBlock(): BigInt {
+    let network = dataSource.network();
+
+    if (network == Network.POLYGON) {
+        return WITHDRAWAL_INVESTOR_FIELD_FIX_BLOCK_POLYGON;
+    } else if (network == Network.OPTIMISM) {
+        return WITHDRAWAL_INVESTOR_FIELD_FIX_BLOCK_OPTIMISM;
+    } else if (network == Network.ARBITRUM) {
+        return WITHDRAWAL_INVESTOR_FIELD_FIX_BLOCK_ARBITRUM;
+    } else if (network == Network.BASE) {
+        return WITHDRAWAL_INVESTOR_FIELD_FIX_BLOCK_BASE;
+    } else if (network == Network.MAINNET) {
+        return WITHDRAWAL_INVESTOR_FIELD_FIX_BLOCK_MAINNET;
+    } else throw new Error(`Missing withdrawal investor field fix block for the network ${network}`);
+}
 
 export namespace Network {
   export const POLYGON = 'matic';
