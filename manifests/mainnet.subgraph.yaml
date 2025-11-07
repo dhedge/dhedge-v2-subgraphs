@@ -1,0 +1,113 @@
+specVersion: 0.0.4
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: PoolFactoryMoonlight
+    network: mainnet
+    source:
+      address: "0x96D33bCF84DdE326014248E2896F79bbb9c13D6d"
+      abi: PoolFactoryMoonlight
+      startBlock: 22581863
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - FundCreated
+      abis:
+        - name: PoolFactoryMoonlight
+          file: ./abis/PoolFactoryMoonlight.json
+      eventHandlers:
+        - event: FundCreated(address,bool,string,string,address,uint256,uint256,uint256,uint256)
+          handler: handleFundCreated
+      file: ./src/pool-factory-moonlight.ts
+  - kind: ethereum
+    name: PoolLimitOrderManager
+    network: mainnet
+    source:
+      address: "0x95B19De479bc693721cab39Da98FfECE062f5Ea4"
+      abi: PoolLimitOrderManager
+      startBlock: 23285003
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - AuthorizedKeeperAdded
+        - AuthorizedKeeperRemoved
+        - LimitOrderCreated
+        - LimitOrderModified
+        - SettlementOrderCreated
+        - LimitOrder
+        - LimitOrderExecuted
+        - LimitOrderDeleted
+        - LimitOrderExecutedPartially
+      abis:
+        - name: PoolLimitOrderManager
+          file: ./abis/PoolLimitOrderManager.json
+        - name: PoolFactoryMoonlight
+          file: ./abis/PoolFactoryMoonlight.json
+      eventHandlers:
+        - event: AuthorizedKeeperAdded(address)
+          handler: handleAuthorizedKeeperAdded
+        - event: AuthorizedKeeperRemoved(address)
+          handler: handleAuthorizedKeeperRemoved
+        - event: LimitOrderCreated(indexed address,indexed address,bytes32)
+          handler: handleLimitOrderCreated
+        - event: LimitOrderDeleted(indexed address,indexed address,bytes32)
+          handler: handleLimitOrderDeleted
+        - event: LimitOrderExecuted(indexed address,indexed address,bytes32)
+          handler: handleLimitOrderExecuted
+        - event: LimitOrderModified(indexed address,indexed address,bytes32)
+          handler: handleLimitOrderModified
+        - event: SettlementOrderCreated(indexed address)
+          handler: handleSettlementOrderCreated
+        - event: LimitOrderExecutedPartially(indexed address,indexed address,bytes32,uint256)
+          handler: handleLimitOrderExecutedPartially
+      file: ./src/pool-limit-order-manager.ts
+
+templates:
+  - kind: ethereum/contract
+    name: PoolLogic
+    network: mainnet
+    source:
+      abi: PoolLogic
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - Deposit
+        - ManagerFeeMinted
+        - TransactionExecuted
+        - Transfer
+        - Withdrawal
+        - Pool
+        - EntryFeeMinted
+        - ExitFeeMinted
+      abis:
+        - name: PoolLogic
+          file: ./abis/PoolLogic.json
+        - name: PoolManagerLogic
+          file: ./abis/PoolManagerLogic.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: WithdrawalVault
+          file: ./abis/WithdrawalVault.json
+      eventHandlers:
+        - event: Deposit(address,address,address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
+          handler: handleDeposit
+        - event: ManagerFeeMinted(address,address,uint256,uint256,uint256,uint256)
+          handler: handleManagerFeeMinted
+        - event: TransactionExecuted(address,address,uint16,uint256)
+          handler: handleTransactionExecuted
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+        - event: Withdrawal(address,address,uint256,uint256,uint256,uint256,uint256,(address,uint256,bool)[],uint256)
+          handler: handleWithdrawal
+        - event: EntryFeeMinted(address,uint256)
+          handler: handleEntryFeeMinted
+        - event: ExitFeeMinted(address,uint256)
+          handler: handleExitFeeMinted
+      file: ./src/pool-logic.ts
