@@ -27,7 +27,7 @@ type Deposit @entity(immutable: true) {
   totalSupply: BigDecimal!
   poolName: String!
   managerName: String!
-  manager: Bytes
+  manager: Bytes!
   uniqueInvestor: Investor!
 }
 
@@ -80,14 +80,16 @@ type Withdrawal @entity(immutable: true) {
   pool: Pool!
   poolName: String!
   uniqueInvestor: Investor!
+  manager: Bytes!
   managerName: String!
 }
 
 type Pool @entity(immutable: false) {
   id: ID!
   fundAddress: Bytes!
+  poolManagerLogicAddress: Bytes
   name: String!
-  manager: Bytes
+  manager: Bytes!
   managerName: String!
   totalSupply: BigDecimal!
   tokenPrice: BigInt

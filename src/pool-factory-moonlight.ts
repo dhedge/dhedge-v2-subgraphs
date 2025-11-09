@@ -5,7 +5,8 @@ import {
   FundCreated,
   Manager,
 } from '../generated/schema';
-import { PoolLogic as PoolLogicTemplate } from '../generated/templates';
+import { PoolLogic as PoolLogicTemplate, PoolManagerLogic as PoolManagerLogicTemplate} from '../generated/templates';
+import {PoolLogic} from "../generated/templates/PoolLogic/PoolLogic";
 
 export function handleFundCreated(event: FundCreatedEvent): void {
   let entity = new FundCreated(
@@ -33,4 +34,6 @@ export function handleFundCreated(event: FundCreatedEvent): void {
   entity.save();
 
   PoolLogicTemplate.create(event.params.fundAddress);
+  let poolContract = PoolLogic.bind(event.params.fundAddress);
+  PoolManagerLogicTemplate.create(poolContract.poolManagerLogic());
 }

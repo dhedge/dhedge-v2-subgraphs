@@ -237,6 +237,7 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
   investor.save();
 
   entity.pool = pool.id;
+  entity.manager = pool.manager;
   entity.managerName = pool.managerName;
   entity.poolName = pool.name;
   entity.totalSupply = pool.totalSupply;
