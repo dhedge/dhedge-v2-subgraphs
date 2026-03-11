@@ -1,4 +1,4 @@
-import {dataSource, BigInt, Address} from '@graphprotocol/graph-ts';
+import {dataSource, BigInt, Address, store} from '@graphprotocol/graph-ts';
 import {
   Deposit as DepositEvent,
   EntryFeeMinted as EntryFeeMintedEvent,
@@ -27,6 +27,8 @@ import {
   ExitFeeMinted,
   ReferralFeeMinted,
   Investment,
+  _DepositInvestorCache,
+  _ReferralFeeMintedCache,
 } from '../generated/schema';
 import { log } from "@graphprotocol/graph-ts/index";
 import { getDaoAddress } from "./addresses";
@@ -72,6 +74,25 @@ export function handleDeposit(event: DepositEvent): void {
   entity.time = event.params.time;
   entity.blockNumber = event.block.number.toI32();
   entity.save();
+
+  // sync with ReferralFeeMinted
+  // check if ReferralFeeMinted has already been processed
+  let cacheId = event.transaction.hash.toHex() + '-' + event.address.toHexString();
+  let referralCache = _ReferralFeeMintedCache.load(cacheId);
+  if (referralCache) {
+    // ReferralFeeMinted was already saved — update its referred field
+    let referralEntity = ReferralFeeMinted.load(referralCache.entityId);
+    if (referralEntity) {
+      referralEntity.referred = event.params.investor;
+      referralEntity.save();
+    }
+    store.remove('_ReferralFeeMintedCache', cacheId);
+  } else {
+    // ReferralFeeMinted hasn't been processed so cache investor address for it
+    let depositCache = new _DepositInvestorCache(cacheId);
+    depositCache.investor = event.params.investor;
+    depositCache.save();
+  }
 }
 
 export function handleManagerFeeMinted(event: ManagerFeeMintedEvent): void {
@@ -379,16 +400,30 @@ export function handleExitFeeMinted(event: ExitFeeMintedEvent): void {
 }
 
 export function handleReferralFeeMinted(event: ReferralFeeMintedEvent): void {
-  let entity = new ReferralFeeMinted(
-    event.transaction.hash.toHex() + '-' + event.logIndex.toString()
-  );
+  let entityId = event.transaction.hash.toHex() + '-' + event.logIndex.toString();
+  let entity = new ReferralFeeMinted(entityId);
 
   entity.pool = event.address;
   entity.referrer = event.params.referrer;
-  entity.referred = event.transaction.from;
   entity.amount = event.params.amount;
   entity.time = event.block.timestamp;
   entity.blockNumber = event.block.number.toI32();
+
+  // sync with Deposit
+  // check if Deposit was already processed
+  let cacheId = event.transaction.hash.toHex() + '-' + event.address.toHexString();
+  let depositCache = _DepositInvestorCache.load(cacheId);
+  if (depositCache) {
+    // Deposit has been already saved so use its investor
+    entity.referred = depositCache.investor;
+    store.remove('_DepositInvestorCache', cacheId);
+  } else {
+    // Deposit wasn't processed yet
+    // save cache so handleDeposit can update it later
+    let referralCache = new _ReferralFeeMintedCache(cacheId);
+    referralCache.entityId = entityId;
+    referralCache.save();
+  }
 
   let poolContract = PoolLogic.bind(event.address);
   let tryPoolTokenPrice = poolContract.try_tokenPrice();

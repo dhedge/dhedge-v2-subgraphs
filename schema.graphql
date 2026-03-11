@@ -131,17 +131,6 @@ type ExitFeeMinted @entity(immutable: true) {
   time: BigInt!
 }
 
-type ReferralFeeMinted @entity(immutable: true) {
-  id: ID!
-  pool: Bytes!
-  referrer: Bytes!
-  referred: Bytes!
-  amount: BigInt!
-  tokenPrice: BigInt
-  blockNumber: Int!
-  time: BigInt!
-}
-
 type Investment @entity(immutable: false) {
   id: ID!
   investorAddress: Bytes!
@@ -239,4 +228,25 @@ type LimitOrder @entity(immutable: false) {
   blockNumberUpdated: Int!
   timeCreated: BigInt!
   timeUpdated: BigInt!
+}
+
+type ReferralFeeMinted @entity(immutable: false) {
+  id: ID!
+  pool: Bytes!
+  referrer: Bytes!
+  referred: Bytes
+  amount: BigInt!
+  tokenPrice: BigInt
+  blockNumber: Int!
+  time: BigInt!
+}
+
+type _DepositInvestorCache @entity(immutable: false) {
+  id: ID!
+  investor: Bytes!
+}
+
+type _ReferralFeeMintedCache @entity(immutable: false) {
+  id: ID!
+  entityId: String!
 }
