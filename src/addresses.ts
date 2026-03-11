@@ -6,6 +6,7 @@ const DAO_ADDRESS_OPTIMISM = Address.fromString('0xD857e322351Dc56592e3D9181FBF6
 const DAO_ADDRESS_BASE = Address.fromString('0xEE27793EBAf6a446c74C2cDd23Bba615e9472264');
 const DAO_ADDRESS_ARBITRUM = Address.fromString('0x26f7cbd49A4DC3321780AE8e7e0cb460f55a7511');
 const DAO_ADDRESS_MAINNET = Address.fromString('0xfF44B48abad9cb7A2485f829E5c9A4d1cee623c9');
+const DAO_ADDRESS_HYPEREVM = Address.fromString('0x0000000000000000000000000000000000000000');
 
 export function getDaoAddress(): Address {
     let network = dataSource.network();
@@ -20,6 +21,8 @@ export function getDaoAddress(): Address {
         return DAO_ADDRESS_ARBITRUM;
     } else if (network == Network.MAINNET) {
         return DAO_ADDRESS_MAINNET;
+    } else if (network == Network.HYPEREVM) {
+        return DAO_ADDRESS_HYPEREVM;
     } else {
         throw new Error(`Missing dao address for the network ${network}`);
     }
@@ -30,6 +33,7 @@ const POOL_FACTORY_ADDRESS_OPTIMISM = Address.fromString('0x5e61a079A178f0E57841
 const POOL_FACTORY_ADDRESS_BASE = Address.fromString('0x49Afe3abCf66CF09Fab86cb1139D8811C8afe56F');
 const POOL_FACTORY_ADDRESS_ARBITRUM = Address.fromString('0xffFb5fB14606EB3a548C113026355020dDF27535');
 const POOL_FACTORY_ADDRESS_MAINNET = Address.fromString('0x96D33bCF84DdE326014248E2896F79bbb9c13D6d');
+const POOL_FACTORY_ADDRESS_HYPEREVM = Address.fromString('0xe91505E2Ab653Dd128c71e9690EeEFd28cc5b333');
 
 export function getPoolFactoryAddress(): Address {
     let network = dataSource.network();
@@ -44,6 +48,8 @@ export function getPoolFactoryAddress(): Address {
         return POOL_FACTORY_ADDRESS_ARBITRUM;
     } else if (network == Network.MAINNET) {
         return POOL_FACTORY_ADDRESS_MAINNET;
+    } else if (network == Network.HYPEREVM) {
+        return POOL_FACTORY_ADDRESS_HYPEREVM;
     } else {
         throw new Error(`Missing pool factory address for the network ${network}`);
     }

@@ -36,6 +36,8 @@ export function getWithdrawalInvestorFieldFixBlock(): BigInt {
         return WITHDRAWAL_INVESTOR_FIELD_FIX_BLOCK_BASE;
     } else if (network == Network.MAINNET) {
         return WITHDRAWAL_INVESTOR_FIELD_FIX_BLOCK_MAINNET;
+    } else if (network == Network.HYPEREVM) {
+      return BigInt.zero();
     } else throw new Error(`Missing withdrawal investor field fix block for the network ${network}`);
 }
 
@@ -45,6 +47,7 @@ export namespace Network {
   export const BASE = 'base';
   export const ARBITRUM = 'arbitrum-one';
   export const MAINNET = 'mainnet';
+  export const HYPEREVM = 'hyperevm';
 }
 
 export function fetchTokenDecimals(tokenAddress: Address): BigInt {
