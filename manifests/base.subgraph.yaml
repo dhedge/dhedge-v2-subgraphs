@@ -119,7 +119,7 @@ templates:
       file: ./src/pool-logic.ts
   - kind: ethereum/contract
     name: PoolManagerLogic
-    network: arbitrum-one
+    network: base
     source:
       abi: PoolManagerLogic
     mapping:
