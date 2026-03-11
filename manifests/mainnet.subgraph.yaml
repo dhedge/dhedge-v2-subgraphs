@@ -18,6 +18,8 @@ dataSources:
       abis:
         - name: PoolFactoryMoonlight
           file: ./abis/PoolFactoryMoonlight.json
+        - name: PoolLogic
+          file: ./abis/PoolLogic.json
       eventHandlers:
         - event: FundCreated(address,bool,string,string,address,uint256,uint256,uint256,uint256)
           handler: handleFundCreated
@@ -111,3 +113,21 @@ templates:
         - event: ExitFeeMinted(address,uint256)
           handler: handleExitFeeMinted
       file: ./src/pool-logic.ts
+  - kind: ethereum/contract
+    name: PoolManagerLogic
+    network: mainnet
+    source:
+      abi: PoolManagerLogic
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.6
+      language: wasm/assemblyscript
+      entities:
+        - ManagerUpdated
+      abis:
+        - name: PoolManagerLogic
+          file: ./abis/PoolManagerLogic.json
+      eventHandlers:
+        - event: ManagerUpdated(address,string)
+          handler: handleManagerUpdated
+      file: ./src/pool-manager-logic.ts
