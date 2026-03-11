@@ -241,19 +241,13 @@ type ReferralFeeMinted @entity(immutable: false) {
   time: BigInt!
 }
 
-type _DepositInvestorCache @entity(immutable: false) {
-  id: ID!
-  investor: Bytes!
-}
-
 type _ReferralFeeMintedCache @entity(immutable: false) {
   id: ID!
   entityId: String!
 }
 
-type _DepositReferralCounter @entity(immutable: false) {
+type _ReferralFeeCounter @entity(immutable: false) {
   id: ID!
-  depositCount: Int!
-  referralCount: Int!
+  count: Int!
 }
 
