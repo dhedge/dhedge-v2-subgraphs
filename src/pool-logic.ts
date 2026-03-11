@@ -29,6 +29,7 @@ import {
   Investment,
   _DepositInvestorCache,
   _ReferralFeeMintedCache,
+  _DepositReferralCounter,
 } from '../generated/schema';
 import { log } from "@graphprotocol/graph-ts/index";
 import { getDaoAddress } from "./addresses";
@@ -76,8 +77,18 @@ export function handleDeposit(event: DepositEvent): void {
   entity.save();
 
   // sync with ReferralFeeMinted
-  // check if ReferralFeeMinted has already been processed
-  let cacheId = event.transaction.hash.toHex() + '-' + event.address.toHexString();
+  let counterId = event.transaction.hash.toHex() + '-' + event.address.toHexString();
+  let counter = _DepositReferralCounter.load(counterId);
+  if (!counter) {
+    counter = new _DepositReferralCounter(counterId);
+    counter.depositCount = 0;
+    counter.referralCount = 0;
+  }
+  let depositIndex = counter.depositCount;
+  counter.depositCount = depositIndex + 1;
+  counter.save();
+
+  let cacheId = counterId + '-' + depositIndex.toString();
   let referralCache = _ReferralFeeMintedCache.load(cacheId);
   if (referralCache) {
     // ReferralFeeMinted was already saved — update its referred field
@@ -410,8 +421,18 @@ export function handleReferralFeeMinted(event: ReferralFeeMintedEvent): void {
   entity.blockNumber = event.block.number.toI32();
 
   // sync with Deposit
-  // check if Deposit was already processed
-  let cacheId = event.transaction.hash.toHex() + '-' + event.address.toHexString();
+  let counterId = event.transaction.hash.toHex() + '-' + event.address.toHexString();
+  let counter = _DepositReferralCounter.load(counterId);
+  if (!counter) {
+    counter = new _DepositReferralCounter(counterId);
+    counter.depositCount = 0;
+    counter.referralCount = 0;
+  }
+  let referralIndex = counter.referralCount;
+  counter.referralCount = referralIndex + 1;
+  counter.save();
+
+  let cacheId = counterId + '-' + referralIndex.toString();
   let depositCache = _DepositInvestorCache.load(cacheId);
   if (depositCache) {
     // Deposit has been already saved so use its investor
