@@ -88,7 +88,8 @@ export function handleDeposit(event: DepositEvent): void {
   let cacheId = counterBase + '-' + depositIndex.toString();
   let referralCache = _ReferralFeeMintedCache.load(cacheId);
   if (referralCache) {
-    // This Deposit has a matching ReferralFeeMinted — update referred field
+    // This Deposit has a matching ReferralFeeMinted
+    // update referred field
     let referralEntity = ReferralFeeMinted.load(referralCache.entityId);
     if (referralEntity) {
       referralEntity.referred = event.params.investor;
@@ -96,7 +97,16 @@ export function handleDeposit(event: DepositEvent): void {
     }
     store.remove('_ReferralFeeMintedCache', cacheId);
     depositCounter.count = depositIndex + 1;
-    depositCounter.save();
+
+    // clean up counters if all referral-deposit pairs have been matched
+    let referralCounterId = counterBase + '-referral';
+    let referralCounter = _ReferralFeeCounter.load(referralCounterId);
+    if (referralCounter && depositCounter.count == referralCounter.count) {
+      store.remove('_ReferralFeeCounter', depositCounterId);
+      store.remove('_ReferralFeeCounter', referralCounterId);
+    } else {
+      depositCounter.save();
+    }
   }
 }
 
@@ -414,7 +424,8 @@ export function handleReferralFeeMinted(event: ReferralFeeMintedEvent): void {
   entity.time = event.block.timestamp;
   entity.blockNumber = event.block.number.toI32();
 
-  // sync with Deposit — ReferralFeeMinted always fires before its paired Deposit
+  // sync with Deposit
+  // ReferralFeeMinted is always handled before its paired Deposit
   let counterBase = event.transaction.hash.toHex() + '-' + event.address.toHexString();
   let referralCounterId = counterBase + '-referral';
   let referralCounter = _ReferralFeeCounter.load(referralCounterId);
