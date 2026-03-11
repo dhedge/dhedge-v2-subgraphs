@@ -131,6 +131,17 @@ type ExitFeeMinted @entity(immutable: true) {
   time: BigInt!
 }
 
+type ReferralFeeMinted @entity(immutable: true) {
+  id: ID!
+  pool: Bytes!
+  referrer: Bytes!
+  referred: Bytes!
+  amount: BigInt!
+  tokenPrice: BigInt
+  blockNumber: Int!
+  time: BigInt!
+}
+
 type Investment @entity(immutable: false) {
   id: ID!
   investorAddress: Bytes!

@@ -3,6 +3,7 @@ import {
   Deposit as DepositEvent,
   EntryFeeMinted as EntryFeeMintedEvent,
   ExitFeeMinted as ExitFeeMintedEvent,
+  ReferralFeeMinted as ReferralFeeMintedEvent,
   ManagerFeeMinted as ManagerFeeMintedEvent,
   TransactionExecuted as TransactionExecutedEvent,
   Transfer as TransferEvent,
@@ -24,6 +25,7 @@ import {
   Investor,
   EntryFeeMinted,
   ExitFeeMinted,
+  ReferralFeeMinted,
   Investment,
 } from '../generated/schema';
 import { log } from "@graphprotocol/graph-ts/index";
@@ -374,4 +376,30 @@ export function handleExitFeeMinted(event: ExitFeeMintedEvent): void {
 
     entity.save();
   }
+}
+
+export function handleReferralFeeMinted(event: ReferralFeeMintedEvent): void {
+  let entity = new ReferralFeeMinted(
+    event.transaction.hash.toHex() + '-' + event.logIndex.toString()
+  );
+
+  entity.pool = event.address;
+  entity.referrer = event.params.referrer;
+  entity.referred = event.transaction.from;
+  entity.amount = event.params.amount;
+  entity.time = event.block.timestamp;
+  entity.blockNumber = event.block.number.toI32();
+
+  let poolContract = PoolLogic.bind(event.address);
+  let tryPoolTokenPrice = poolContract.try_tokenPrice();
+  if (tryPoolTokenPrice.reverted) {
+    log.info(
+      'pool token price was reverted in tx hash: {} at blockNumber: {}',
+      [event.transaction.hash.toHex(), event.block.number.toString()]
+    );
+  } else {
+    entity.tokenPrice = tryPoolTokenPrice.value;
+  }
+
+  entity.save();
 }

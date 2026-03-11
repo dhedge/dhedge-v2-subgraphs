@@ -89,6 +89,7 @@ templates:
         - Pool
         - EntryFeeMinted
         - ExitFeeMinted
+        - ReferralFeeMinted
       abis:
         - name: PoolLogic
           file: ./abis/PoolLogic.json
@@ -113,6 +114,8 @@ templates:
           handler: handleEntryFeeMinted
         - event: ExitFeeMinted(address,uint256)
           handler: handleExitFeeMinted
+        - event: ReferralFeeMinted(indexed address,uint256)
+          handler: handleReferralFeeMinted
       file: ./src/pool-logic.ts
   - kind: ethereum/contract
     name: PoolManagerLogic
