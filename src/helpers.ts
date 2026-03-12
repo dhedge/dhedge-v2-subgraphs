@@ -93,8 +93,7 @@ export function instantiatePool(
     pool.fundAddress = fundAddress;
   }
 
-  // Manager Logic
-  let managerContract = PoolManagerLogic.bind(poolContract.poolManagerLogic());
+  let managerLogicContract = PoolManagerLogic.bind(poolContract.poolManagerLogic());
 
   // Pool Entity
   let tryPoolName = poolContract.try_name();
@@ -107,8 +106,8 @@ export function instantiatePool(
     pool.name = tryPoolName.value;
   }
 
-  pool.manager = managerContract.manager();
-  pool.managerName = managerContract.managerName();
+  pool.manager = managerLogicContract.manager();
+  pool.managerName = managerLogicContract.managerName();
   pool.decimals = poolTokenDecimals;
 
   let poolSupply = convertTokenToDecimal(
