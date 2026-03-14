@@ -229,3 +229,25 @@ type LimitOrder @entity(immutable: false) {
   timeCreated: BigInt!
   timeUpdated: BigInt!
 }
+
+type ReferralFeeMinted @entity(immutable: false) {
+  id: ID!
+  pool: Bytes!
+  referrer: Bytes!
+  referred: Bytes
+  amount: BigInt!
+  tokenPrice: BigInt
+  blockNumber: Int!
+  time: BigInt!
+}
+
+type _ReferralFeeMintedCache @entity(immutable: false) {
+  id: ID!
+  entityId: String!
+}
+
+type _ReferralFeeCounter @entity(immutable: false) {
+  id: ID!
+  count: Int!
+}
+

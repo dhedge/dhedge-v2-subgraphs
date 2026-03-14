@@ -1,8 +1,9 @@
-import {dataSource, BigInt, Address} from '@graphprotocol/graph-ts';
+import {dataSource, BigInt, Address, store} from '@graphprotocol/graph-ts';
 import {
   Deposit as DepositEvent,
   EntryFeeMinted as EntryFeeMintedEvent,
   ExitFeeMinted as ExitFeeMintedEvent,
+  ReferralFeeMinted as ReferralFeeMintedEvent,
   ManagerFeeMinted as ManagerFeeMintedEvent,
   TransactionExecuted as TransactionExecutedEvent,
   Transfer as TransferEvent,
@@ -24,7 +25,10 @@ import {
   Investor,
   EntryFeeMinted,
   ExitFeeMinted,
+  ReferralFeeMinted,
   Investment,
+  _ReferralFeeMintedCache,
+  _ReferralFeeCounter,
 } from '../generated/schema';
 import { log } from "@graphprotocol/graph-ts/index";
 import { getDaoAddress } from "./addresses";
@@ -70,6 +74,40 @@ export function handleDeposit(event: DepositEvent): void {
   entity.time = event.params.time;
   entity.blockNumber = event.block.number.toI32();
   entity.save();
+
+  // sync with ReferralFeeMinted
+  let counterBase = event.transaction.hash.toHex() + '-' + event.address.toHexString();
+  let depositCounterId = counterBase + '-deposit';
+  let depositCounter = _ReferralFeeCounter.load(depositCounterId);
+  if (!depositCounter) {
+    depositCounter = new _ReferralFeeCounter(depositCounterId);
+    depositCounter.count = 0;
+  }
+  let depositIndex = depositCounter.count;
+
+  let cacheId = counterBase + '-' + depositIndex.toString();
+  let referralCache = _ReferralFeeMintedCache.load(cacheId);
+  if (referralCache) {
+    // This Deposit has a matching ReferralFeeMinted
+    // update referred field
+    let referralEntity = ReferralFeeMinted.load(referralCache.entityId);
+    if (referralEntity) {
+      referralEntity.referred = event.params.investor;
+      referralEntity.save();
+    }
+    store.remove('_ReferralFeeMintedCache', cacheId);
+    depositCounter.count = depositIndex + 1;
+
+    // clean up counters if all referral-deposit pairs have been matched
+    let referralCounterId = counterBase + '-referral';
+    let referralCounter = _ReferralFeeCounter.load(referralCounterId);
+    if (referralCounter && depositCounter.count == referralCounter.count) {
+      store.remove('_ReferralFeeCounter', depositCounterId);
+      store.remove('_ReferralFeeCounter', referralCounterId);
+    } else {
+      depositCounter.save();
+    }
+  }
 }
 
 export function handleManagerFeeMinted(event: ManagerFeeMintedEvent): void {
@@ -374,4 +412,47 @@ export function handleExitFeeMinted(event: ExitFeeMintedEvent): void {
 
     entity.save();
   }
+}
+
+export function handleReferralFeeMinted(event: ReferralFeeMintedEvent): void {
+  let entityId = event.transaction.hash.toHex() + '-' + event.logIndex.toString();
+  let entity = new ReferralFeeMinted(entityId);
+
+  entity.pool = event.address;
+  entity.referrer = event.params.referrer;
+  entity.amount = event.params.amount;
+  entity.time = event.block.timestamp;
+  entity.blockNumber = event.block.number.toI32();
+
+  // sync with Deposit
+  // ReferralFeeMinted is always handled before its paired Deposit
+  let counterBase = event.transaction.hash.toHex() + '-' + event.address.toHexString();
+  let referralCounterId = counterBase + '-referral';
+  let referralCounter = _ReferralFeeCounter.load(referralCounterId);
+  if (!referralCounter) {
+    referralCounter = new _ReferralFeeCounter(referralCounterId);
+    referralCounter.count = 0;
+  }
+  let referralIndex = referralCounter.count;
+  referralCounter.count = referralIndex + 1;
+  referralCounter.save();
+
+  // save cache so the next matching handleDeposit can update referred
+  let cacheId = counterBase + '-' + referralIndex.toString();
+  let referralCache = new _ReferralFeeMintedCache(cacheId);
+  referralCache.entityId = entityId;
+  referralCache.save();
+
+  let poolContract = PoolLogic.bind(event.address);
+  let tryPoolTokenPrice = poolContract.try_tokenPrice();
+  if (tryPoolTokenPrice.reverted) {
+    log.info(
+      'pool token price was reverted in tx hash: {} at blockNumber: {}',
+      [event.transaction.hash.toHex(), event.block.number.toString()]
+    );
+  } else {
+    entity.tokenPrice = tryPoolTokenPrice.value;
+  }
+
+  entity.save();
 }
