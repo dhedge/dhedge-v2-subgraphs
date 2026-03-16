@@ -195,6 +195,7 @@ export function handleTransfer(event: TransferEvent): void {
             'investor pool balance was reverted in tx hash: {} at blockNumber: {}',
             [event.transaction.hash.toHex(), event.block.number.toString()]
         );
+        investmentFrom.investorBalance = investmentFrom.investorBalance.minus(event.params.value);
       } else {
         if (!investmentFrom.investorBalance.equals(BigInt.zero()) && tryInvestorFromBalanceOf.value.equals(BigInt.zero())) {
           investmentFrom.positionOpenTimestamp = null;
@@ -203,20 +204,22 @@ export function handleTransfer(event: TransferEvent): void {
         investmentFrom.save();
       }
 
+      let investmentToId = investorToAddress.toHexString() + event.address.toHexString();
+      let investmentTo = instantiateInvestment(investmentToId, investorToAddress, event.address);
       let tryInvestorToBalanceOf = poolContract.try_balanceOf(investorToAddress);
       if (tryInvestorToBalanceOf.reverted) {
         log.info(
             'investor pool balance was reverted in tx hash: {} at blockNumber: {}',
             [event.transaction.hash.toHex(), event.block.number.toString()]
         );
+        investmentTo.investorBalance = investmentTo.investorBalance.plus(event.params.value);
       } else {
-        let investmentId = investorToAddress.toHexString() + event.address.toHexString();
-        let investment = instantiateInvestment(investmentId, event.params.to, event.address);
-        if (investment.investorBalance.equals(BigInt.zero()) && !tryInvestorToBalanceOf.value.equals(BigInt.zero())) {
-          investment.positionOpenTimestamp = event.block.timestamp;
+
+        if (investmentTo.investorBalance.equals(BigInt.zero()) && !tryInvestorToBalanceOf.value.equals(BigInt.zero())) {
+          investmentTo.positionOpenTimestamp = event.block.timestamp;
         }
-        investment.investorBalance = tryInvestorToBalanceOf.value;
-        investment.save();
+        investmentTo.investorBalance = tryInvestorToBalanceOf.value;
+        investmentTo.save();
       }
     }
   }
