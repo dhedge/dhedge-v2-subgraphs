@@ -93,21 +93,9 @@ export function instantiatePool(
     pool.fundAddress = fundAddress;
   }
 
-  // Static fields: only fetch on first creation (they rarely change)
+  // Static fields: only fetch on first creation
   if (isNew) {
     pool.decimals = fetchTokenDecimals(fundAddress);
-
-    let tryPoolManagerLogic = poolContract.try_poolManagerLogic();
-    if (tryPoolManagerLogic.reverted) {
-      log.info('poolManagerLogic was reverted in tx hash: {} at blockNumber: {}', [
-        event.transaction.hash.toHex(),
-        event.block.number.toString(),
-      ]);
-    } else {
-      let managerLogicContract = PoolManagerLogic.bind(tryPoolManagerLogic.value);
-      pool.manager = managerLogicContract.manager();
-      pool.managerName = managerLogicContract.managerName();
-    }
 
     let tryPoolName = poolContract.try_name();
     if (tryPoolName.reverted) {
@@ -121,6 +109,18 @@ export function instantiatePool(
   }
 
   // Dynamic fields: always update (change on every deposit/withdrawal)
+  let tryPoolManagerLogic = poolContract.try_poolManagerLogic();
+  if (tryPoolManagerLogic.reverted) {
+    log.info('poolManagerLogic was reverted in tx hash: {} at blockNumber: {}', [
+      event.transaction.hash.toHex(),
+      event.block.number.toString(),
+    ]);
+  } else {
+    let managerLogicContract = PoolManagerLogic.bind(tryPoolManagerLogic.value);
+    pool.manager = managerLogicContract.manager();
+    pool.managerName = managerLogicContract.managerName();
+  }
+
   let decimals = pool.decimals ? pool.decimals! : ZERO_BI;
   let poolSupply = convertTokenToDecimal(
     poolContract.totalSupply(),
