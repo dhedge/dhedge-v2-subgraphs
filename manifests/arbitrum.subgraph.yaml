@@ -1,4 +1,4 @@
-specVersion: 0.0.4
+specVersion: 1.2.0
 schema:
   file: ./schema.graphql
 dataSources:
@@ -11,7 +11,7 @@ dataSources:
       startBlock: 73967815
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - FundCreated
@@ -33,7 +33,7 @@ dataSources:
       startBlock: 335970168
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - AuthorizedKeeperAdded
@@ -77,7 +77,7 @@ templates:
       abi: PoolLogic
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - Deposit
@@ -123,7 +123,7 @@ templates:
       abi: PoolManagerLogic
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - ManagerUpdated
