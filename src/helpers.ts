@@ -86,33 +86,45 @@ export function instantiatePool(
 ): Pool {
   let pool = Pool.load(id);
   let poolContract = PoolLogic.bind(fundAddress);
-  let poolTokenDecimals = fetchTokenDecimals(fundAddress);
+  let isNew = !pool;
 
   if (!pool) {
     pool = new Pool(id);
     pool.fundAddress = fundAddress;
   }
 
-  let managerLogicContract = PoolManagerLogic.bind(poolContract.poolManagerLogic());
+  // Static fields: only fetch on first creation (they rarely change)
+  if (isNew) {
+    pool.decimals = fetchTokenDecimals(fundAddress);
 
-  // Pool Entity
-  let tryPoolName = poolContract.try_name();
-  if (tryPoolName.reverted) {
-    log.info('pool name was reverted in tx hash: {} at blockNumber: {}', [
-      event.transaction.hash.toHex(),
-      event.block.number.toString(),
-    ]);
-  } else {
-    pool.name = tryPoolName.value;
+    let tryPoolManagerLogic = poolContract.try_poolManagerLogic();
+    if (tryPoolManagerLogic.reverted) {
+      log.info('poolManagerLogic was reverted in tx hash: {} at blockNumber: {}', [
+        event.transaction.hash.toHex(),
+        event.block.number.toString(),
+      ]);
+    } else {
+      let managerLogicContract = PoolManagerLogic.bind(tryPoolManagerLogic.value);
+      pool.manager = managerLogicContract.manager();
+      pool.managerName = managerLogicContract.managerName();
+    }
+
+    let tryPoolName = poolContract.try_name();
+    if (tryPoolName.reverted) {
+      log.info('pool name was reverted in tx hash: {} at blockNumber: {}', [
+        event.transaction.hash.toHex(),
+        event.block.number.toString(),
+      ]);
+    } else {
+      pool.name = tryPoolName.value;
+    }
   }
 
-  pool.manager = managerLogicContract.manager();
-  pool.managerName = managerLogicContract.managerName();
-  pool.decimals = poolTokenDecimals;
-
+  // Dynamic fields: always update (change on every deposit/withdrawal)
+  let decimals = pool.decimals ? pool.decimals! : ZERO_BI;
   let poolSupply = convertTokenToDecimal(
     poolContract.totalSupply(),
-    poolTokenDecimals
+    decimals
   );
   pool.totalSupply = poolSupply;
 
