@@ -123,18 +123,28 @@ templates:
           handler: handleDeposit
         - event: ManagerFeeMinted(address,address,uint256,uint256,uint256,uint256)
           handler: handleManagerFeeMinted
+          calls:
+            PoolLogic.tokenPrice: PoolLogic[event.address].tokenPrice()
         - event: TransactionExecuted(address,address,uint16,uint256)
           handler: handleTransactionExecuted
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
+          calls:
+            PoolLogic.tokenPrice: PoolLogic[event.address].tokenPrice()
         - event: Withdrawal(address,address,uint256,uint256,uint256,uint256,uint256,(address,uint256,bool)[],uint256)
           handler: handleWithdrawal
         - event: EntryFeeMinted(address,uint256)
           handler: handleEntryFeeMinted
+          calls:
+            PoolLogic.tokenPrice: PoolLogic[event.address].tokenPrice()
         - event: ExitFeeMinted(address,uint256)
           handler: handleExitFeeMinted
+          calls:
+            PoolLogic.tokenPrice: PoolLogic[event.address].tokenPrice()
         - event: ReferralFeeMinted(indexed address,uint256)
           handler: handleReferralFeeMinted
+          calls:
+            PoolLogic.tokenPrice: PoolLogic[event.address].tokenPrice()
       file: ./src/pool-logic.ts
   - kind: ethereum/contract
     name: PoolManagerLogic

@@ -1,4 +1,4 @@
-import {dataSource, BigInt, Address, store} from '@graphprotocol/graph-ts';
+import { dataSource, BigInt, Address, store } from '@graphprotocol/graph-ts';
 import {
   Deposit as DepositEvent,
   EntryFeeMinted as EntryFeeMintedEvent,
