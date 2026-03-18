@@ -1,4 +1,4 @@
-specVersion: 0.0.4
+specVersion: 1.2.0
 schema:
   file: ./schema.graphql
 dataSources:
@@ -11,7 +11,7 @@ dataSources:
       startBlock: 642351
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - FundCreated
@@ -31,7 +31,7 @@ dataSources:
       startBlock: 6469716
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - FundCreated
@@ -53,7 +53,7 @@ dataSources:
       startBlock: 135734000
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - AuthorizedKeeperAdded
@@ -97,7 +97,7 @@ templates:
       abi: PoolLogic
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - Deposit
@@ -123,18 +123,28 @@ templates:
           handler: handleDeposit
         - event: ManagerFeeMinted(address,address,uint256,uint256,uint256,uint256)
           handler: handleManagerFeeMinted
+          calls:
+            PoolLogic.tokenPrice: PoolLogic[event.address].tokenPrice()
         - event: TransactionExecuted(address,address,uint16,uint256)
           handler: handleTransactionExecuted
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
+          calls:
+            PoolLogic.tokenPrice: PoolLogic[event.address].tokenPrice()
         - event: Withdrawal(address,address,uint256,uint256,uint256,uint256,uint256,(address,uint256,bool)[],uint256)
           handler: handleWithdrawal
         - event: EntryFeeMinted(address,uint256)
           handler: handleEntryFeeMinted
+          calls:
+            PoolLogic.tokenPrice: PoolLogic[event.address].tokenPrice()
         - event: ExitFeeMinted(address,uint256)
           handler: handleExitFeeMinted
+          calls:
+            PoolLogic.tokenPrice: PoolLogic[event.address].tokenPrice()
         - event: ReferralFeeMinted(indexed address,uint256)
           handler: handleReferralFeeMinted
+          calls:
+            PoolLogic.tokenPrice: PoolLogic[event.address].tokenPrice()
       file: ./src/pool-logic.ts
   - kind: ethereum/contract
     name: PoolManagerLogic
@@ -143,7 +153,7 @@ templates:
       abi: PoolManagerLogic
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.6
+      apiVersion: 0.0.9
       language: wasm/assemblyscript
       entities:
         - ManagerUpdated

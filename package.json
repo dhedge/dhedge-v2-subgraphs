@@ -25,8 +25,8 @@
 
   },
   "dependencies": {
-    "@graphprotocol/graph-cli": "^0.97.1",
-    "@graphprotocol/graph-ts": "^0.38.0"
+    "@graphprotocol/graph-cli": "^0.98.1",
+    "@graphprotocol/graph-ts": "^0.38.2"
   },
   "devDependencies": {
     "env-cmd": "^10.1.0"
