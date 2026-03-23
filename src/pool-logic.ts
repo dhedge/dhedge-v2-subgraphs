@@ -424,6 +424,7 @@ export function handleReferralFeeMinted(event: ReferralFeeMintedEvent): void {
   entity.pool = event.address;
   entity.referrer = event.params.referrer;
   entity.amount = event.params.amount;
+  entity.transactionHash = event.transaction.hash;
   entity.time = event.block.timestamp;
   entity.blockNumber = event.block.number.toI32();
 
