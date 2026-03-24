@@ -237,6 +237,7 @@ type ReferralFeeMinted @entity(immutable: false) {
   referred: Bytes
   amount: BigInt!
   tokenPrice: BigInt
+  transactionHash: Bytes!
   blockNumber: Int!
   time: BigInt!
 }
