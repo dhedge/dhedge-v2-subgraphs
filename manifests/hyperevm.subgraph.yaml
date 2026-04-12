@@ -6,7 +6,7 @@ dataSources:
     name: PoolFactoryMoonlight
     network: hyperevm
     source:
-      address: "0xe91505E2Ab653Dd128c71e9690EeEFd28cc5b333"
+      address: "0x615037C2Df6FA97634c5aD2d8144708b9dd3B176"
       abi: PoolFactoryMoonlight
       startBlock: 25742856
     mapping:
