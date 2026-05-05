@@ -6,7 +6,8 @@ import {
   Manager,
 } from '../generated/schema';
 import { PoolLogic as PoolLogicTemplate, PoolManagerLogic as PoolManagerLogicTemplate} from '../generated/templates';
-import {PoolLogic} from "../generated/templates/PoolLogic/PoolLogic";
+import { PoolLogic } from "../generated/templates/PoolLogic/PoolLogic";
+import { log } from "@graphprotocol/graph-ts";
 
 export function handleFundCreated(event: FundCreatedEvent): void {
   let entity = new FundCreated(
@@ -34,6 +35,15 @@ export function handleFundCreated(event: FundCreatedEvent): void {
   entity.save();
 
   PoolLogicTemplate.create(event.params.fundAddress);
-  let poolContract = PoolLogic.bind(event.params.fundAddress);
-  PoolManagerLogicTemplate.create(poolContract.poolManagerLogic());
+
+  const poolContract = PoolLogic.bind(event.params.fundAddress);
+  const tryPoolManagerLogic = poolContract.try_poolManagerLogic();
+  if (tryPoolManagerLogic.reverted) {
+    log.warning('pool manager logic was reverted in tx hash: {} at blockNumber: {}', [
+      event.transaction.hash.toHex(),
+      event.block.number.toString(),
+    ]);
+  } else {
+    PoolManagerLogicTemplate.create(tryPoolManagerLogic.value);
+  }
 }
