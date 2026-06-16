@@ -121,15 +121,7 @@ export function instantiatePool(
     pool.managerName = managerLogicContract.managerName();
   }
 
-  let tryTotalSupply = poolContract.try_totalSupply();
-  if (tryTotalSupply.reverted) {
-    log.info(
-      'pool total supply was reverted in tx hash: {} at blockNumber: {}',
-      [event.transaction.hash.toHex(), event.block.number.toString()]
-    );
-  } else {
-    pool.totalSupply = tryTotalSupply.value;
-  }
+  pool.totalSupply = poolContract.totalSupply();
 
   let tryPoolTokenPrice = poolContract.try_tokenPrice();
   if (tryPoolTokenPrice.reverted) {
