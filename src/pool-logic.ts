@@ -154,6 +154,7 @@ export function handleTransactionExecuted(
   entity.transactionType = event.params.transactionType;
   entity.time = event.params.time;
   entity.blockNumber = event.block.number.toI32();
+  entity.logIndex = event.logIndex.toI32();
   entity.save();
 }
 
