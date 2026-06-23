@@ -62,7 +62,7 @@ export function handleDeposit(event: DepositEvent): void {
   entity.poolName = pool.name;
   entity.pool = pool.id;
   entity.manager = pool.manager;
-  entity.totalSupply = pool.totalSupply;
+  entity.totalSupply = event.params.totalSupply;
   entity.uniqueInvestor = investor.id;
   entity.fundAddress = event.params.fundAddress;
   entity.investor = event.params.investor;
@@ -282,7 +282,7 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
   entity.manager = pool.manager;
   entity.managerName = pool.managerName;
   entity.poolName = pool.name;
-  entity.totalSupply = pool.totalSupply;
+  entity.totalSupply = event.params.totalSupply;
   entity.uniqueInvestor = investor.id;
   entity.fundAddress = event.params.fundAddress;
   entity.investor = investorAddress;

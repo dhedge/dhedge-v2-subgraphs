@@ -24,7 +24,7 @@ type Deposit @entity(immutable: true) {
   time: BigInt!
   blockNumber: Int!
   pool: Pool!
-  totalSupply: BigDecimal!
+  totalSupply: BigInt!
   poolName: String!
   managerName: String!
   manager: Bytes!
@@ -77,7 +77,7 @@ type Withdrawal @entity(immutable: true) {
   fundValue: BigInt!
   time: BigInt!
   block: Int!
-  totalSupply: BigDecimal!
+  totalSupply: BigInt!
   pool: Pool!
   poolName: String!
   uniqueInvestor: Investor!
@@ -92,7 +92,7 @@ type Pool @entity(immutable: false) {
   name: String!
   manager: Bytes!
   managerName: String!
-  totalSupply: BigDecimal!
+  totalSupply: BigInt!
   tokenPrice: BigInt
   decimals: BigInt
   deposits: [Deposit!]! @derivedFrom(field: "pool")
