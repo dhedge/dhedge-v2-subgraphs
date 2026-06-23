@@ -53,6 +53,7 @@ type TransactionExecuted @entity(immutable: true) {
   blockNumber: Int!
   poolName: String!
   managerName: String!
+  logIndex: Int!
 }
 
 type Transfer @entity(immutable: true) {
