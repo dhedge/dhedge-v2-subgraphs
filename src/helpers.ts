@@ -121,12 +121,7 @@ export function instantiatePool(
     pool.managerName = managerLogicContract.managerName();
   }
 
-  let decimals = pool.decimals ? pool.decimals! : ZERO_BI;
-  let poolSupply = convertTokenToDecimal(
-    poolContract.totalSupply(),
-    decimals
-  );
-  pool.totalSupply = poolSupply;
+  pool.totalSupply = poolContract.totalSupply();
 
   let tryPoolTokenPrice = poolContract.try_tokenPrice();
   if (tryPoolTokenPrice.reverted) {
