@@ -237,7 +237,7 @@ export function handleWithdrawal(event: WithdrawalEvent): void {
   let poolContract = PoolLogic.bind(event.params.fundAddress);
 
   let investorAddress: Address;
-  if (event.params.time.lt(getWithdrawalInvestorFieldFixBlock())) {
+  if (event.block.number.lt(getWithdrawalInvestorFieldFixBlock())) {
     // use this address instead of event.params.investor to avoid incorrect address mapping
     // when using 3rd party contracts like EasySwapper
     investorAddress =  event.transaction.from;
